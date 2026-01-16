@@ -1,0 +1,234 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-color: #FF6B6B;
+  --primary-color-dark: #E85555;
+  --primary-color-light: #FF8888;
+}
+
+[data-theme='orange'] {
+  --primary-color: #FF8B3D;
+  --primary-color-dark: #E87625;
+  --primary-color-light: #FFA05C;
+}
+
+[data-theme='yellow'] {
+  --primary-color: #FFD93D;
+  --primary-color-dark: #E8C125;
+  --primary-color-light: #FFE15C;
+}
+
+[data-theme='green'] {
+  --primary-color: #6BCF7F;
+  --primary-color-dark: #55B869;
+  --primary-color-light: #88DC9A;
+}
+
+[data-theme='teal'] {
+  --primary-color: #4FD1C5;
+  --primary-color-dark: #38B2A3;
+  --primary-color-light: #72DED5;
+}
+
+[data-theme='blue'] {
+  --primary-color: #4299E1;
+  --primary-color-dark: #3182CE;
+  --primary-color-light: #63B3ED;
+}
+
+[data-theme='indigo'] {
+  --primary-color: #667EEA;
+  --primary-color-dark: #5A67D8;
+  --primary-color-light: #7F9CF5;
+}
+
+[data-theme='purple'] {
+  --primary-color: #9F7AEA;
+  --primary-color-dark: #805AD5;
+  --primary-color-light: #B794F4;
+}
+
+[data-theme='pink'] {
+  --primary-color: #ED64A6;
+  --primary-color-dark: #D53F8C;
+  --primary-color-light: #F687B3;
+}
+
+[data-theme='rose'] {
+  --primary-color: #F56565;
+  --primary-color-dark: #E53E3E;
+  --primary-color-light: #FC8181;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+  @apply transition-colors duration-200;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Scrollbar customizada - tema amber/stone */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #f59e0b #f5f5f4;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #f5f5f4;
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #f59e0b 0%, #f97316 100%);
+  border-radius: 10px;
+  border: 2px solid #f5f5f4;
+  transition: all 0.3s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ea580c 0%, #dc2626 100%);
+  border-color: #e7e5e4;
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: #dc2626;
+}
+
+/* Dark mode scrollbar */
+.dark * {
+  scrollbar-color: #f59e0b #1e293b;
+}
+
+.dark *::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #f59e0b 0%, #f97316 100%);
+  border: 2px solid #1e293b;
+}
+
+.dark *::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ea580c 0%, #dc2626 100%);
+  border-color: #334155;
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .glass {
+    @apply backdrop-blur-xl bg-white/60 dark:bg-white/5;
+    @apply border border-amber-400/30 dark:border-white/10;
+    @apply shadow-2xl;
+  }
+
+  .glass-strong {
+    @apply backdrop-blur-2xl bg-white/80 dark:bg-white/8;
+    @apply border border-amber-400/40 dark:border-white/15;
+    @apply shadow-2xl;
+  }
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(217, 119, 6, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(217, 119, 6, 0.6);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft 0.8s ease-out;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.8s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Gradientes customizados */
+.bg-gradient-rustic {
+  background: linear-gradient(135deg, #78350f 0%, #92400e 25%, #b45309 50%, #d97706 75%, #f59e0b 100%);
+}
+
+.bg-gradient-dark-rustic {
+  background: linear-gradient(135deg, #1c1917 0%, #292524 25%, #44403c 50%, #57534e 75%, #78716c 100%);
+}
