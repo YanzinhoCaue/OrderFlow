@@ -71,6 +71,9 @@ export async function generateTableQRCode(tableId: string) {
   try {
     const supabase = await createClient()
 
+    // Generate a new token for the QR code (invalidates old links)
+    const newToken = crypto.randomUUID()
+
     // Get table and restaurant info
     const { data: table, error: tableError } = await supabase
       .from('tables')
@@ -81,8 +84,11 @@ export async function generateTableQRCode(tableId: string) {
     if (tableError) throw tableError
     if (!table) throw new Error('Table not found')
 
-    // Generate QR code URL
-    const menuUrl = `${process.env.NEXT_PUBLIC_APP_URL}/menu/${(table.restaurants as any).slug}/${table.qr_code_token}`
+    // For now, use localhost for QR code URL
+    const baseUrl = 'http://localhost:3000'
+
+    // Generate QR code URL - points to the menu with table token (new token)
+    const menuUrl = `${baseUrl}/menu/${(table.restaurants as any).slug}/${newToken}`
 
     // Generate QR code image
     const qrCodeDataUrl = await QRCode.toDataURL(menuUrl, {
@@ -114,10 +120,13 @@ export async function generateTableQRCode(tableId: string) {
       .from('qr-codes')
       .getPublicUrl(uploadData.path)
 
-    // Update table with QR code URL
+    // Update table with new QR code URL and new token
     const { error: updateError } = await supabase
       .from('tables')
-      .update({ qr_code_url: publicUrl })
+      .update({ 
+        qr_code_url: publicUrl,
+        qr_code_token: newToken
+      })
       .eq('id', table.id)
 
     if (updateError) throw updateError

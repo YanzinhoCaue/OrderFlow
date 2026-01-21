@@ -6,24 +6,21 @@ export default async function Home() {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (user) {
-    // Check if user has completed onboarding
+    // Get profile + restaurants
     const { data: profile } = await supabase
       .from('profiles')
       .select('*, restaurants(*)')
       .eq('id', user.id)
       .single()
 
-    if (!profile) {
-      redirect('/onboarding')
+    // If user has a completed restaurant, go to dashboard (owner)
+    const restaurant = profile && (profile as any).restaurants?.[0]
+    if (restaurant && (restaurant as any).onboarding_completed) {
+      redirect('/dashboard')
     }
 
-    const restaurant = profile.restaurants?.[0]
-    
-    if (!restaurant || !restaurant.onboarding_completed) {
-      redirect('/onboarding')
-    }
-
-    redirect('/dashboard')
+    // Otherwise, treat as customer and go to menu
+    redirect('/menu')
   }
 
   redirect('/login')

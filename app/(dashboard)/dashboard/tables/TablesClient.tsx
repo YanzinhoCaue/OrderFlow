@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useMemo } from 'react'
-import { FiDownload } from 'react-icons/fi'
+import { useState, useMemo, useTransition } from 'react'
+import { FiDownload, FiRefreshCw } from 'react-icons/fi'
 import Button from '@/components/ui/Button'
 import NewTableModal from '@/components/dashboard/NewTableModal'
 import EditTableModal from '@/components/dashboard/EditTableModal'
 import TableSearch from '@/components/dashboard/TableSearch'
+import { generateTableQRCode, getTables } from '@/app/actions/tables'
 
 interface Table {
   id: string
@@ -21,46 +22,76 @@ interface Table {
 interface TablesClientProps {
   tables: Table[]
   restaurantId: string
+  labels?: {
+    title: string
+    heading: string
+    subtitle: string
+    addTable: string
+    newQR: string
+    downloadQR: string
+    previewQR: string
+    generating: string
+    regenerateQR: string
+    noTables: string
+  }
 }
 
-export default function TablesClient({ tables, restaurantId }: TablesClientProps) {
+export default function TablesClient({ tables, restaurantId, labels }: TablesClientProps) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [tablesList, setTablesList] = useState<Table[]>(tables)
+  const [isPending, startTransition] = useTransition()
+  const [regeneratingId, setRegeneratingId] = useState<string | null>(null)
+
+  const handleRegenerateQRCode = (tableId: string) => {
+    setRegeneratingId(tableId)
+    startTransition(async () => {
+      const result = await generateTableQRCode(tableId)
+      if (result.success) {
+        // Refetch tables para atualizar a URL do QR code
+        const updatedTables = await getTables(restaurantId)
+        setTablesList(updatedTables)
+      } else {
+        alert('Erro ao regenerar QR code: ' + result.error)
+      }
+      setRegeneratingId(null)
+    })
+  }
 
   const filteredTables = useMemo(() => {
-    if (!searchQuery.trim()) return tables
+    if (!searchQuery.trim()) return tablesList
 
     const query = searchQuery.toLowerCase()
-    return tables.filter((table) => {
+    return tablesList.filter((table) => {
       const matchNumber = table.table_number.toLowerCase().includes(query)
       const matchDescription = table.description?.toLowerCase().includes(query)
       return matchNumber || matchDescription
     })
-  }, [tables, searchQuery])
+  }, [tablesList, searchQuery])
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-white/80 dark:bg-white/5 border-2 border-amber-500/20 rounded-2xl px-6 py-4 shadow-xl backdrop-blur-xl">
         <div>
-          <p className="text-sm text-stone-600 dark:text-stone-400">Gestão de espaço</p>
+          <p className="text-sm text-stone-600 dark:text-stone-400">{labels?.heading ?? 'Gestão de espaço'}</p>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-[#b45309] via-[#d97706] to-[#f59e0b] dark:from-amber-200 dark:via-amber-400 dark:to-orange-500 bg-clip-text text-transparent">
-            Mesas
+            {labels?.title ?? 'Mesas'}
           </h1>
           <p className="text-xs text-stone-500 dark:text-stone-500 mt-1">
-            Gerencie as mesas e códigos QR do seu restaurante
+            {labels?.subtitle ?? 'Gerencie as mesas e códigos QR do seu restaurante'}
           </p>
         </div>
-        <NewTableModal restaurantId={restaurantId} />
+        <NewTableModal restaurantId={restaurantId} buttonText={labels?.addTable ?? 'Nova Mesa'} />
       </div>
 
-      {tables.length === 0 ? (
+      {tablesList.length === 0 ? (
         <div className="bg-white/85 dark:bg-white/5 border-2 border-amber-500/20 rounded-2xl shadow-xl backdrop-blur-xl p-12 text-center">
           <h3 className="text-lg font-semibold text-stone-900 dark:text-white mb-2">
-            Nenhuma mesa cadastrada
+            {labels?.noTables ?? 'Nenhuma mesa cadastrada'}
           </h3>
           <p className="text-stone-600 dark:text-stone-400 mb-6">
-            Crie mesas e gere QR codes para que seus clientes possam fazer pedidos
+            {labels?.subtitle ?? 'Crie mesas e gere QR codes para que seus clientes possam fazer pedidos'}
           </p>
-          <NewTableModal restaurantId={restaurantId} buttonText="Criar Primeira Mesa" />
+          <NewTableModal restaurantId={restaurantId} buttonText={labels?.addTable ?? 'Criar Primeira Mesa'} />
         </div>
       ) : (
         <>
@@ -71,10 +102,10 @@ export default function TablesClient({ tables, restaurantId }: TablesClientProps
           {filteredTables.length === 0 ? (
             <div className="bg-white/85 dark:bg-white/5 border-2 border-amber-500/20 rounded-2xl shadow-xl backdrop-blur-xl p-12 text-center">
               <h3 className="text-lg font-semibold text-stone-900 dark:text-white mb-2">
-                Nenhuma mesa encontrada
+                {labels?.noTables ?? 'Nenhuma mesa encontrada'}
               </h3>
               <p className="text-stone-600 dark:text-stone-400">
-                Tente outro termo de pesquisa
+                {labels?.subtitle ?? 'Tente outro termo de pesquisa'}
               </p>
             </div>
           ) : (
@@ -144,7 +175,8 @@ export default function TablesClient({ tables, restaurantId }: TablesClientProps
                         {table.qr_code_url && (
                           <div className="bg-white dark:bg-white/95 rounded-xl p-3 border border-amber-500/20">
                             <img
-                              src={table.qr_code_url}
+                              key={`${table.id}-${table.qr_code_token}`}
+                              src={`${table.qr_code_url}?t=${Date.now()}`}
                               alt={`QR Code Mesa ${table.table_number}`}
                               className="w-full rounded-lg"
                             />
@@ -152,6 +184,20 @@ export default function TablesClient({ tables, restaurantId }: TablesClientProps
                         )}
 
                         <div className="flex gap-2">
+                          <Button 
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleRegenerateQRCode(table.id)
+                            }}
+                            disabled={regeneratingId === table.id || isPending}
+                            variant="outline" 
+                            size="sm" 
+                            className="w-full flex-1 border-blue-500/30 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-500/10 disabled:opacity-50"
+                            title={labels?.regenerateQR ?? 'Regenerar QR Code'}
+                          >
+                            <FiRefreshCw className={`mr-2 ${regeneratingId === table.id ? 'animate-spin' : ''}`} />
+                            {regeneratingId === table.id ? (labels?.generating ?? 'Gerando...') : (labels?.newQR ?? 'Novo QR')}
+                          </Button>
                           {table.qr_code_url && (
                             <a
                               href={table.qr_code_url}
@@ -167,7 +213,7 @@ export default function TablesClient({ tables, restaurantId }: TablesClientProps
                                 className="w-full border-amber-500/30 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-500/10"
                               >
                                 <FiDownload className="mr-2" />
-                                Baixar QR
+                                {labels?.downloadQR ?? 'Baixar QR'}
                               </Button>
                             </a>
                           )}

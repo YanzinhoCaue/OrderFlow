@@ -2,11 +2,12 @@
 
 import { useEffect, useState, useTransition } from 'react'
 import { createPortal } from 'react-dom'
-import { FiX, FiClock, FiUser, FiCheckCircle, FiArrowRightCircle, FiXCircle } from 'react-icons/fi'
+import { FiX, FiClock, FiUser, FiCheckCircle, FiArrowRightCircle, FiXCircle, FiPrinter } from 'react-icons/fi'
 import Button from '@/components/ui/Button'
 import { ORDER_STATUS_CONFIG } from '@/lib/constants/order-status'
 import { getRelativeTime, formatDateTime } from '@/lib/utils/date'
 import { OrderStatus } from '@/lib/supabase/types'
+import { printThermalReceipt } from '@/components/print/ThermalReceiptPrint'
 
 interface OrderItemIngredient {
   id: string
@@ -49,6 +50,33 @@ export default function OrderDetailsModal({ order, children, onStatusChange, cur
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [pending, startTransition] = useTransition()
+
+  const handlePrint = () => {
+    const items = order.order_items.map((item) => {
+      const ingredients = item.order_item_ingredients?.map((ing) => ({
+        name: ing.ingredients?.name || 'Ingrediente',
+        wasAdded: ing.was_added,
+      })) || []
+
+      return {
+        quantity: item.quantity,
+        dishName: item.dishes?.name || 'Prato',
+        unitPrice: Number(item.unit_price || 0),
+        totalPrice: Number(item.total_price || 0),
+        notes: item.notes || undefined,
+        ingredients: ingredients.length > 0 ? ingredients : undefined,
+      }
+    })
+
+    printThermalReceipt({
+      orderNumber: order.order_number,
+      tableNumber: order.tables?.table_number || 'N/A',
+      createdAt: order.created_at,
+      items,
+      totalAmount: Number(order.total_amount || 0),
+      customerName: order.customer_name || undefined,
+    })
+  }
 
   useEffect(() => setMounted(true), [])
 
@@ -180,6 +208,14 @@ export default function OrderDetailsModal({ order, children, onStatusChange, cur
                     {pending || currentUpdating ? 'Atualizando...' : 'Avançar'}
                   </Button>
                 )}
+                <Button
+                  onClick={handlePrint}
+                  variant="outline"
+                  className="w-full border-amber-300 text-amber-700 dark:text-amber-200"
+                >
+                  <FiPrinter className="mr-2" />
+                  Imprimir
+                </Button>
                 {order.status !== 'delivered' && order.status !== 'cancelled' && (
                   <Button
                     onClick={handleDeliver}

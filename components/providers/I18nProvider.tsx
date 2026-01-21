@@ -2,14 +2,11 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { LocaleCode, DEFAULT_LOCALE } from '@/lib/constants/locales'
-
-const localeLoaders: Record<LocaleCode, () => Promise<any>> = {
-  'pt-BR': () => import('@/i18n/locales/pt-BR.json'),
-  en: () => import('@/i18n/locales/en.json'),
-  es: () => import('@/i18n/locales/es.json'),
-  zh: () => import('@/i18n/locales/zh.json'),
-  ja: () => import('@/i18n/locales/ja.json'),
-}
+import ptBR from '@/i18n/locales/pt-BR.json'
+import en from '@/i18n/locales/en.json'
+import es from '@/i18n/locales/es.json'
+import zh from '@/i18n/locales/zh.json'
+import ja from '@/i18n/locales/ja.json'
 
 type Translations = Record<string, any>
 
@@ -21,40 +18,48 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined)
 
+// Static mapping of translations
+const translationMap: Record<LocaleCode, Translations> = {
+  'pt-BR': ptBR,
+  en: en,
+  es: es,
+  zh: zh,
+  ja: ja,
+}
+
+// Get translations synchronously
+function getTranslations(locale: LocaleCode): Translations {
+  return translationMap[locale] || translationMap[DEFAULT_LOCALE]
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<LocaleCode>(DEFAULT_LOCALE)
-  const [translations, setTranslations] = useState<Translations>({})
-
-  useEffect(() => {
-    // Load translations for current locale
-    const loadTranslations = async () => {
-      try {
-        const loader = localeLoaders[locale]
-        if (!loader) throw new Error(`No loader for locale ${locale}`)
-        const data = await loader()
-        setTranslations(data.default)
-      } catch (error) {
-        console.error(`Failed to load translations for ${locale}`, error)
+  // Initialize locale from cookie or localStorage to keep dashboard/public menu in sync
+  const [locale, setLocaleState] = useState<LocaleCode>(() => {
+    if (typeof window !== 'undefined') {
+      const cookieMatch = document.cookie.match(/(?:^|; )locale=([^;]+)/)
+      if (cookieMatch) {
+        const decodedLocale = decodeURIComponent(cookieMatch[1]) as LocaleCode
+        const validLocales: LocaleCode[] = ['pt-BR', 'en', 'es', 'zh', 'ja']
+        if (validLocales.includes(decodedLocale)) return decodedLocale
       }
+      const saved = localStorage.getItem('locale') as LocaleCode | null
+      const validLocales: LocaleCode[] = ['pt-BR', 'en', 'es', 'zh', 'ja']
+      if (saved && validLocales.includes(saved)) return saved
     }
+    return DEFAULT_LOCALE
+  })
 
-    loadTranslations()
+  // Load translations synchronously
+  const translations = getTranslations(locale)
 
-    // Save to localStorage
+  // Persist locale for both dashboard and public menu
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('locale', locale)
+      document.cookie = `locale=${encodeURIComponent(locale)}; path=/; max-age=${60 * 60 * 24 * 365}`
+      document.documentElement.lang = locale
     }
   }, [locale])
-
-  useEffect(() => {
-    // Load saved locale from localStorage
-    if (typeof window !== 'undefined') {
-      const savedLocale = localStorage.getItem('locale') as LocaleCode
-      if (savedLocale) {
-        setLocaleState(savedLocale)
-      }
-    }
-  }, [])
 
   const setLocale = (newLocale: LocaleCode) => {
     setLocaleState(newLocale)

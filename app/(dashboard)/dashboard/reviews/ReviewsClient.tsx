@@ -17,9 +17,23 @@ interface ReviewsClientProps {
     comment?: string | null
     created_at: string
   }>
+  labels?: {
+    title: string
+    heading: string
+    subtitle: string
+    noReviews: string
+    noReviewsDescription: string
+    rating: string
+    dish: string
+    waiter: string
+    restaurant: string
+    comment: string
+    all: string
+    searchPlaceholder: string
+  }
 }
 
-export default function ReviewsClient({ restaurantId, metrics, reviews }: ReviewsClientProps) {
+export default function ReviewsClient({ restaurantId, metrics, reviews, labels }: ReviewsClientProps) {
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<'all' | 'restaurant' | 'waiter' | 'dish'>('all')
 
@@ -33,20 +47,20 @@ export default function ReviewsClient({ restaurantId, metrics, reviews }: Review
   }, [reviews, search, typeFilter])
 
   const summaryCards = [
-    { key: 'restaurant', label: 'Restaurante', ...metrics.restaurant, color: 'from-amber-500 to-orange-500' },
-    { key: 'waiter', label: 'Atendimento', ...metrics.waiter, color: 'from-blue-500 to-cyan-500' },
-    { key: 'dish', label: 'Pratos', ...metrics.dish, color: 'from-emerald-500 to-green-500' },
+    { key: 'restaurant', label: labels?.restaurant ?? 'Restaurante', ...metrics.restaurant, color: 'from-amber-500 to-orange-500' },
+    { key: 'waiter', label: labels?.waiter ?? 'Atendimento', ...metrics.waiter, color: 'from-blue-500 to-cyan-500' },
+    { key: 'dish', label: labels?.dish ?? 'Pratos', ...metrics.dish, color: 'from-emerald-500 to-green-500' },
   ] as any[]
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-white/80 dark:bg-white/5 border-2 border-amber-500/20 rounded-2xl px-6 py-4 shadow-xl backdrop-blur-xl">
         <div>
-          <p className="text-sm text-stone-600 dark:text-stone-400">Métricas</p>
+          <p className="text-sm text-stone-600 dark:text-stone-400">{labels?.heading ?? 'Métricas'}</p>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-[#b45309] via-[#d97706] to-[#f59e0b] dark:from-amber-200 dark:via-amber-400 dark:to-orange-500 bg-clip-text text-transparent">
-            Avaliações
+            {labels?.title ?? 'Avaliações'}
           </h1>
-          <p className="text-xs text-stone-500 dark:text-stone-500 mt-1">Acompanhe avaliações de clientes por área</p>
+          <p className="text-xs text-stone-500 dark:text-stone-500 mt-1">{labels?.subtitle ?? 'Acompanhe avaliações de clientes por área'}</p>
         </div>
       </div>
 
@@ -81,14 +95,14 @@ export default function ReviewsClient({ restaurantId, metrics, reviews }: Review
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por comentário..."
+              placeholder={labels?.searchPlaceholder ?? 'Buscar por comentário...'}
               className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-amber-500/30 dark:border-amber-500/40 bg-white/80 dark:bg-slate-900/60 text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/50 transition-all"
             />
           </div>
 
           <div className="flex flex-wrap gap-2">
             {(['all','restaurant','waiter','dish'] as const).map((status) => {
-              const labelMap: Record<typeof status, string> = { all: 'Todos', restaurant: 'Restaurante', waiter: 'Atendimento', dish: 'Pratos' } as any
+              const labelMap: Record<typeof status, string> = { all: labels?.all ?? 'Todos', restaurant: labels?.restaurant ?? 'Restaurante', waiter: labels?.waiter ?? 'Atendimento', dish: labels?.dish ?? 'Pratos' } as any
               const isActive = typeFilter === status
               return (
                 <button
@@ -109,8 +123,8 @@ export default function ReviewsClient({ restaurantId, metrics, reviews }: Review
       {/* Lista */}
       {filtered.length === 0 ? (
         <div className="bg-white/85 dark:bg-white/5 border-2 border-amber-500/20 rounded-2xl shadow-xl backdrop-blur-xl p-12 text-center">
-          <h3 className="text-lg font-semibold text-stone-900 dark:text-white mb-2">Nenhuma avaliação</h3>
-          <p className="text-stone-600 dark:text-stone-400">As avaliações aparecerão aqui quando os clientes começarem a enviar feedback.</p>
+          <h3 className="text-lg font-semibold text-stone-900 dark:text-white mb-2">{labels?.noReviews ?? 'Nenhuma avaliação'}</h3>
+          <p className="text-stone-600 dark:text-stone-400">{labels?.noReviewsDescription ?? 'As avaliações aparecerão aqui quando os clientes começarem a enviar feedback.'}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
@@ -120,7 +134,7 @@ export default function ReviewsClient({ restaurantId, metrics, reviews }: Review
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
                     <span className="text-xs px-2 py-1 rounded-full border bg-amber-50/70 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-200 dark:border-amber-500/30">
-                      {r.target_type === 'restaurant' ? 'Restaurante' : r.target_type === 'waiter' ? 'Atendimento' : 'Prato'}
+                      {r.target_type === 'restaurant' ? (labels?.restaurant ?? 'Restaurante') : r.target_type === 'waiter' ? (labels?.waiter ?? 'Atendimento') : (labels?.dish ?? 'Prato')}
                     </span>
                     <div className="flex items-center gap-2 text-sm text-stone-700 dark:text-stone-200">
                       {[...Array(5)].map((_, i) => (

@@ -1,77 +1,51 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useTheme } from '@/components/providers/ThemeProvider'
-import { completeOnboarding, uploadFile } from '@/app/actions/onboarding'
-import { THEME_COLORS } from '@/lib/constants/theme-colors'
-import { validateCPF, formatCPF, isCPF } from '@/lib/validations/cpf'
+import { completeOnboarding, completeCustomerOnboarding } from '@/app/actions/onboarding'
+import { validateCPF, formatCPF } from '@/lib/validations/cpf'
 import { validateCNPJ, formatCNPJ } from '@/lib/validations/cnpj'
 import ThemeSwitcher from '@/components/shared/ThemeSwitcher'
-import { FiUpload, FiUser, FiPhone, FiFileText, FiImage, FiCheck } from 'react-icons/fi'
-import router from 'next/router'
-
-// 30 Rustic Colors for Menu Theme
-const RUSTIC_COLORS = [
-  { name: 'Café Escuro', value: '#5C4033' },
-  { name: 'Madeira Clara', value: '#8B6F47' },
-  { name: 'Terracota', value: '#A0522D' },
-  { name: 'Marrom Quente', value: '#8B4513' },
-  { name: 'Ouro Velho', value: '#B8860B' },
-  { name: 'Siena', value: '#704214' },
-  { name: 'Copper', value: '#B87333' },
-  { name: 'Chocolate', value: '#6B4423' },
-  { name: 'Verde Musgo', value: '#556B2F' },
-  { name: 'Verde Floresta', value: '#355E3B' },
-  { name: 'Cinza Ardósia', value: '#556B82' },
-  { name: 'Pedra Natural', value: '#696969' },
-  { name: 'Vinho Tinto', value: '#722F37' },
-  { name: 'Bordô', value: '#800020' },
-  { name: 'Ocre Dourado', value: '#CC7722' },
-  { name: 'Arenito', value: '#A89589' },
-  { name: 'Barro Vermelho', value: '#A52A2A' },
-  { name: 'Azeite', value: '#808000' },
-  { name: 'Cortiça', value: '#9B7653' },
-  { name: 'Carvão', value: '#36454F' },
-  { name: 'Âmbar Escuro', value: '#AA6C39' },
-  { name: 'Terra Queimada', value: '#8A3324' },
-  { name: 'Castanha', value: '#654321' },
-  { name: 'Oliva Escuro', value: '#6B8E23' },
-  { name: 'Bronze Antigo', value: '#8C7853' },
-  { name: 'Mogno', value: '#704241' },
-  { name: 'Mel Escuro', value: '#C17817' },
-  { name: 'Ferrugem', value: '#A0410D' },
-  { name: 'Verde Azeitona', value: '#5B6F3A' },
-  { name: 'Cobre Envelhecido', value: '#996847' },
-]
+import { FiUser, FiPhone, FiFileText, FiCheck, FiShoppingBag, FiSettings } from 'react-icons/fi'
 
 interface FormData {
+  userType: 'customer' | 'owner'
+  // Owner fields
   restaurantName: string
   restaurantPhone: string
   ownerName: string
   cpfCnpj: string
-  logo: File | null
-  cover: File | null
-  themeColor: string
+  // Customer fields
+  fullName: string
+  address: string
 }
 
 export default function OnboardingWizard() {
   const router = useRouter()
-  const { setThemeColor } = useTheme()
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [logoPreview, setLogoPreview] = useState<string>('')
-  const [coverPreview, setCoverPreview] = useState<string>('')
   const [documentType, setDocumentType] = useState<'cpf' | 'cnpj'>('cpf')
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null)
+
+  // Get redirect URL from localStorage on mount
+  useEffect(() => {
+    const storedRedirect = localStorage.getItem('oauth_redirect')
+    if (storedRedirect) {
+      setRedirectUrl(storedRedirect)
+      localStorage.removeItem('oauth_redirect')
+    }
+  }, [])
 
   const [formData, setFormData] = useState<FormData>({
+    userType: 'owner',
+    // owner defaults
     restaurantName: '',
     restaurantPhone: '',
     ownerName: '',
     cpfCnpj: '',
-    logo: null,
-    cover: null,
-    themeColor: '#FF6B6B',
+    // customer defaults
+    fullName: '',
+    address: '',
   })
 
   const updateField = (field: keyof FormData, value: any) => {
@@ -79,65 +53,49 @@ export default function OnboardingWizard() {
     setErrors(prev => ({ ...prev, [field]: '' }))
   }
 
-  const handleFileChange = (field: 'logo' | 'cover', file: File | null) => {
-    if (!file) return
-    
-    updateField(field, file)
-    
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      if (field === 'logo') {
-        setLogoPreview(reader.result as string)
-      } else {
-        setCoverPreview(reader.result as string)
-      }
-    }
-    reader.readAsDataURL(file)
-  }
-
-  const handlePaste = (field: 'logo' | 'cover', e: React.ClipboardEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    const items = e.clipboardData?.items
-    if (!items) return
-
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].kind === 'file' && items[i].type.startsWith('image/')) {
-        const file = items[i].getAsFile()
-        if (file) {
-          handleFileChange(field, file)
-        }
-      }
-    }
-  }
-
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.restaurantName.trim()) {
-      newErrors.restaurantName = 'Nome do restaurante é obrigatório'
-    }
-    if (!formData.ownerName.trim()) {
-      newErrors.ownerName = 'Nome do proprietário é obrigatório'
-    }
-    if (!formData.restaurantPhone.trim()) {
-      newErrors.restaurantPhone = 'Telefone é obrigatório'
-    }
-    if (!formData.cpfCnpj.trim()) {
-      newErrors.cpfCnpj = `${documentType === 'cpf' ? 'CPF' : 'CNPJ'} é obrigatório`
-    } else {
-      const clean = formData.cpfCnpj.replace(/\D/g, '')
-      if (documentType === 'cpf') {
-        if (clean.length !== 11) {
-          newErrors.cpfCnpj = 'CPF deve ter 11 dígitos'
-        } else if (!validateCPF(clean)) {
-          newErrors.cpfCnpj = 'CPF inválido'
-        }
+    if (formData.userType === 'owner') {
+      if (!formData.restaurantName.trim()) {
+        newErrors.restaurantName = 'Nome do restaurante é obrigatório'
+      }
+      if (!formData.ownerName.trim()) {
+        newErrors.ownerName = 'Nome do proprietário é obrigatório'
+      }
+      if (!formData.restaurantPhone.trim()) {
+        newErrors.restaurantPhone = 'Telefone é obrigatório'
+      }
+      if (!formData.cpfCnpj.trim()) {
+        newErrors.cpfCnpj = `${documentType === 'cpf' ? 'CPF' : 'CNPJ'} é obrigatório`
       } else {
-        if (clean.length !== 14) {
-          newErrors.cpfCnpj = 'CNPJ deve ter 14 dígitos'
-        } else if (!validateCNPJ(clean)) {
-          newErrors.cpfCnpj = 'CNPJ inválido'
+        const clean = formData.cpfCnpj.replace(/\D/g, '')
+        if (documentType === 'cpf') {
+          if (clean.length !== 11) {
+            newErrors.cpfCnpj = 'CPF deve ter 11 dígitos'
+          } else if (!validateCPF(clean)) {
+            newErrors.cpfCnpj = 'CPF inválido'
+          }
+        } else {
+          if (clean.length !== 14) {
+            newErrors.cpfCnpj = 'CNPJ deve ter 14 dígitos'
+          } else if (!validateCNPJ(clean)) {
+            newErrors.cpfCnpj = 'CNPJ inválido'
+          }
         }
+      }
+    } else {
+      if (!formData.fullName.trim()) {
+        newErrors.fullName = 'Nome completo é obrigatório'
+      }
+      if (!formData.restaurantPhone.trim()) {
+        newErrors.restaurantPhone = 'Telefone é obrigatório'
+      }
+      const clean = formData.cpfCnpj.replace(/\D/g, '')
+      if (clean.length !== 11) {
+        newErrors.cpfCnpj = 'CPF deve ter 11 dígitos'
+      } else if (!validateCPF(clean)) {
+        newErrors.cpfCnpj = 'CPF inválido'
       }
     }
 
@@ -163,44 +121,43 @@ export default function OnboardingWizard() {
     setIsLoading(true)
 
     try {
-      // Upload logo if provided
-      let logoUrl = ''
-      if (formData.logo) {
-        const result = await uploadFile(formData.logo, 'restaurant-logos', 'logo')
-        if (result.success && result.url) {
-          logoUrl = result.url
+      if (formData.userType === 'owner') {
+        // Complete onboarding for owner (create restaurant)
+        const result = await completeOnboarding({
+          restaurantName: formData.restaurantName,
+          restaurantPhone: formData.restaurantPhone,
+          restaurantDescription: '',
+          ownerName: formData.ownerName,
+          cpfCnpj: formData.cpfCnpj,
+          logoUrl: '',
+          coverUrl: '',
+          themeColor: '#FF6B35',
+        })
+
+        if (result.success) {
+          router.push('/dashboard')
+        } else {
+          console.error('Owner onboarding failed:', result.error)
+          setErrors({ general: result.error || 'Falha ao completar cadastro' })
         }
-      }
-
-      // Upload cover if provided
-      let coverUrl = ''
-      if (formData.cover) {
-        const result = await uploadFile(formData.cover, 'restaurant-covers', 'cover')
-        if (result.success && result.url) {
-          coverUrl = result.url
-        }
-      }
-
-      // Complete onboarding
-      const result = await completeOnboarding({
-        restaurantName: formData.restaurantName,
-        restaurantPhone: formData.restaurantPhone,
-        restaurantDescription: '',
-        ownerName: formData.ownerName,
-        cpfCnpj: formData.cpfCnpj,
-        logoUrl,
-        coverUrl,
-        themeColor: formData.themeColor,
-      })
-
-      if (result.success) {
-        // Apply theme color
-        const colorKey = THEME_COLORS.find(c => c.value === formData.themeColor)?.key || 'red'
-        setThemeColor(colorKey)
-        
-        router.push('/dashboard')
       } else {
-        setErrors({ general: result.error || 'Falha ao completar cadastro' })
+        // Complete onboarding for customer (profile only)
+        console.log('Submitting customer onboarding:', { fullName: formData.fullName, phone: formData.restaurantPhone })
+        const result = await completeCustomerOnboarding({
+          fullName: formData.fullName,
+          cpf: formData.cpfCnpj,
+          phone: formData.restaurantPhone,
+          address: formData.address,
+        })
+        console.log('Customer onboarding result:', result)
+        if (result.success) {
+          // Use redirectUrl if available (from QR code flow), otherwise go to /menu
+          const finalRedirect = redirectUrl || '/menu'
+          router.push(finalRedirect)
+        } else {
+          console.error('Customer onboarding failed:', result.error)
+          setErrors({ general: result.error || 'Falha ao completar cadastro' })
+        }
       }
     } catch (error) {
       console.error('Onboarding error:', error)
@@ -236,7 +193,7 @@ export default function OnboardingWizard() {
           {/* Header */}
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-[#b45309] via-[#d97706] to-[#f59e0b] dark:from-amber-200 dark:via-amber-400 dark:to-orange-500 bg-clip-text text-transparent mb-2">
-              Configure seu Restaurante
+              Faça seu cadastro
             </h1>
             <p className="text-stone-600 dark:text-stone-400 text-sm">
               Preencha as informações para começar
@@ -249,36 +206,70 @@ export default function OnboardingWizard() {
             </div>
           )}
 
-          {/* Color Selection */}
+          {/* User Type Selection */}
           <div className="mb-6">
             <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-3">
-              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: formData.themeColor }} />
-              Cor do Cardápio *
+              Você é: *
             </label>
-            <div className="grid grid-cols-15 gap-2 p-4 bg-white/50 dark:bg-white/5 rounded-xl border-2 border-amber-300/30 dark:border-white/10">
-              {RUSTIC_COLORS.map((color) => (
-                <button
-                  key={color.value}
-                  onClick={() => updateField('themeColor', color.value)}
-                  title={color.name}
-                  className={`w-9 h-9 rounded-full transition-all duration-200 flex items-center justify-center shadow-lg ${
-                    formData.themeColor === color.value
-                      ? 'ring-3 ring-offset-2 ring-amber-600 dark:ring-amber-400 scale-110'
-                      : 'hover:scale-110'
-                  }`}
-                  style={{ backgroundColor: color.value }}
-                >
-                  {formData.themeColor === color.value && (
-                    <FiCheck className="text-white drop-shadow-lg" size={16} strokeWidth={3} />
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => updateField('userType', 'owner')}
+                className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+                  formData.userType === 'owner'
+                    ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-500/10'
+                    : 'border-amber-300/50 dark:border-white/10 bg-white/50 dark:bg-white/5 hover:border-amber-400'
+                }`}
+              >
+                <div className="flex flex-col items-center gap-3">
+                  <div className={`p-4 rounded-full ${
+                    formData.userType === 'owner'
+                      ? 'bg-amber-500 text-white'
+                      : 'bg-amber-100 dark:bg-white/10 text-amber-600 dark:text-amber-400'
+                  }`}>
+                    <FiSettings size={22} />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="font-bold text-stone-800 dark:text-stone-100">Proprietário</h3>
+                    <p className="text-xs text-stone-600 dark:text-stone-400 mt-1">Gerenciar restaurante</p>
+                  </div>
+                  {formData.userType === 'owner' && (
+                    <FiCheck className="text-amber-500" size={20} strokeWidth={3} />
                   )}
-                </button>
-              ))}
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { updateField('userType', 'customer'); setDocumentType('cpf') }}
+                className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+                  formData.userType === 'customer'
+                    ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-500/10'
+                    : 'border-amber-300/50 dark:border-white/10 bg-white/50 dark:bg-white/5 hover:border-amber-400'
+                }`}
+              >
+                <div className="flex flex-col items-center gap-3">
+                  <div className={`p-4 rounded-full ${
+                    formData.userType === 'customer'
+                      ? 'bg-amber-500 text-white'
+                      : 'bg-amber-100 dark:bg-white/10 text-amber-600 dark:text-amber-400'
+                  }`}>
+                    <FiShoppingBag size={22} />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="font-bold text-stone-800 dark:text-stone-100">Cliente</h3>
+                    <p className="text-xs text-stone-600 dark:text-stone-400 mt-1">Fazer pedidos</p>
+                  </div>
+                  {formData.userType === 'customer' && (
+                    <FiCheck className="text-amber-500" size={20} strokeWidth={3} />
+                  )}
+                </div>
+              </button>
             </div>
           </div>
 
-          {/* Form Grid */}
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Left Column */}
+          {/* Dynamic Form */}
+          {formData.userType === 'owner' ? (
             <div className="space-y-4">
               {/* Restaurant Name */}
               <div>
@@ -340,6 +331,7 @@ export default function OnboardingWizard() {
                     value={documentType}
                     onChange={(e) => handleDocumentTypeChange(e.target.value as 'cpf' | 'cnpj')}
                     className="px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white focus:outline-none focus:border-amber-500 transition-colors"
+                    title="Tipo de documento"
                   >
                     <option value="cpf">CPF</option>
                     <option value="cnpj">CNPJ</option>
@@ -358,76 +350,73 @@ export default function OnboardingWizard() {
                 {errors.cpfCnpj && <p className="text-red-500 text-xs mt-1">{errors.cpfCnpj}</p>}
               </div>
             </div>
-
-            {/* Right Column */}
+          ) : (
             <div className="space-y-4">
-              {/* Logo Upload */}
+              {/* Full Name */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
-                  <FiImage className="text-amber-500" />
-                  Logo do Restaurante
+                  <FiUser className="text-amber-500" />
+                  Nome Completo *
                 </label>
-                <div
-                  onPaste={(e) => handlePaste('logo', e)}
-                  className="relative"
-                >
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileChange('logo', e.target.files?.[0] || null)}
-                    className="hidden"
-                    id="logo-upload"
-                  />
-                  <label
-                    htmlFor="logo-upload"
-                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-amber-300/50 dark:border-white/20 rounded-xl cursor-pointer hover:border-amber-500 transition-all duration-300 bg-white/50 dark:bg-white/5 hover:bg-amber-50/30 dark:hover:bg-white/10 group"
-                  >
-                    {logoPreview ? (
-                      <img src={logoPreview} alt="Logo preview" className="h-full w-full object-contain rounded-xl p-2" />
-                    ) : (
-                      <>
-                        <FiUpload className="text-3xl text-amber-500 mb-2 group-hover:scale-110 transition-transform" />
-                        <span className="text-xs text-stone-600 dark:text-stone-400">Clique ou Cole (Ctrl+V)</span>
-                      </>
-                    )}
-                  </label>
-                </div>
+                <input
+                  type="text"
+                  value={formData.fullName}
+                  onChange={(e) => updateField('fullName', e.target.value)}
+                  placeholder="Seu nome completo"
+                  className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
+                />
+                {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
               </div>
 
-              {/* Cover Upload */}
+              {/* Phone */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
-                  <FiImage className="text-amber-500" />
-                  Imagem de Capa
+                  <FiPhone className="text-amber-500" />
+                  Telefone *
                 </label>
-                <div
-                  onPaste={(e) => handlePaste('cover', e)}
-                  className="relative"
-                >
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileChange('cover', e.target.files?.[0] || null)}
-                    className="hidden"
-                    id="cover-upload"
-                  />
-                  <label
-                    htmlFor="cover-upload"
-                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-amber-300/50 dark:border-white/20 rounded-xl cursor-pointer hover:border-amber-500 transition-all duration-300 bg-white/50 dark:bg-white/5 hover:bg-amber-50/30 dark:hover:bg-white/10 group"
-                  >
-                    {coverPreview ? (
-                      <img src={coverPreview} alt="Cover preview" className="h-full w-full object-cover rounded-xl" />
-                    ) : (
-                      <>
-                        <FiUpload className="text-3xl text-amber-500 mb-2 group-hover:scale-110 transition-transform" />
-                        <span className="text-xs text-stone-600 dark:text-stone-400">Clique ou Cole (Ctrl+V)</span>
-                      </>
-                    )}
-                  </label>
-                </div>
+                <input
+                  type="tel"
+                  value={formData.restaurantPhone}
+                  onChange={(e) => updateField('restaurantPhone', e.target.value)}
+                  placeholder="(00) 00000-0000"
+                  className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
+                />
+                {errors.restaurantPhone && <p className="text-red-500 text-xs mt-1">{errors.restaurantPhone}</p>}
+              </div>
+
+              {/* CPF */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
+                  <FiFileText className="text-amber-500" />
+                  CPF *
+                </label>
+                <input
+                  type="text"
+                  value={formData.cpfCnpj}
+                  onChange={(e) => handleCpfCnpjChange(e.target.value)}
+                  placeholder={'000.000.000-00'}
+                  maxLength={14}
+                  className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
+                />
+                {errors.cpfCnpj && <p className="text-red-500 text-xs mt-1">{errors.cpfCnpj}</p>}
+              </div>
+
+              {/* Address */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
+                  <FiFileText className="text-amber-500" />
+                  Endereço
+                </label>
+                <input
+                  type="text"
+                  value={formData.address}
+                  onChange={(e) => updateField('address', e.target.value)}
+                  placeholder="Rua, número, bairro, cidade"
+                  className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
+                />
               </div>
             </div>
-          </div>
+          )}
 
           {/* Submit Button */}
           <div className="mt-8 flex justify-center">

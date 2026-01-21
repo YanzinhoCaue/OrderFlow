@@ -22,7 +22,6 @@ interface DashboardShellProps {
   availableMonths: string[]
   todayOrdersCount: number
   todayRevenue: number
-  activeTablesCount: number | null
   chartData: DaySeries[]
   topDishSeries: Series[]
   daysInMonth: number
@@ -35,7 +34,6 @@ export default function DashboardShell({
   availableMonths,
   todayOrdersCount,
   todayRevenue,
-  activeTablesCount,
   chartData,
   topDishSeries,
   daysInMonth,
@@ -85,7 +83,7 @@ export default function DashboardShell({
           <MonthFilter currentMonth={monthKey} months={availableMonths} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <StatsCard
             title={t('dashboard.todayOrders') || 'Pedidos Hoje'}
             value={todayOrdersCount || 0}
@@ -98,12 +96,7 @@ export default function DashboardShell({
             iconType="dollar"
             color="green"
           />
-          <StatsCard
-            title={t('dashboard.activeTables') || 'Mesas Ativas'}
-            value={activeTablesCount || 0}
-            iconType="users"
-            color="purple"
-          />
+
           <StatsCard
             title={t('dashboard.avgOrderTime') || 'Tempo Médio'}
             value="15 min"

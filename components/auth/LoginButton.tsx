@@ -3,14 +3,19 @@
 import { FcGoogle } from 'react-icons/fc'
 import { createClient } from '@/lib/supabase/client'
 
-export default function LoginButton() {
+interface LoginButtonProps {
+  redirectUrl?: string  // kept for backward compatibility but not used anymore
+}
+
+export default function LoginButton({ redirectUrl }: LoginButtonProps) {
   const supabase = createClient()
 
   const handleGoogleLogin = async () => {
+    const callbackUrl = `${window.location.origin}/callback`
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/callback`,
+        redirectTo: callbackUrl,
       },
     })
 

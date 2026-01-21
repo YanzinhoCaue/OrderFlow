@@ -9,12 +9,28 @@ interface PreviewClientProps {
   restaurant: any
   categories: any[]
   dishes: any[]
+  labels?: {
+    title: string
+    heading: string
+    subtitle: string
+    selectLanguage: string
+    selectTheme: string
+    previewMenu: string
+    menuColor: string
+    lightMode: string
+    darkMode: string
+    statistics: string
+    information: string
+    payment: string
+    socialMedia: string
+  }
 }
 
 export default function PreviewClient({
   restaurant,
   categories,
   dishes,
+  labels,
 }: PreviewClientProps) {
   const [themeColor, setThemeColor] = useState(restaurant?.theme_color || '#FF6B35')
   const [isSaving, setIsSaving] = useState(false)
@@ -93,7 +109,7 @@ export default function PreviewClient({
   return (
     <div className="min-h-screen p-4 lg:p-8 bg-white dark:bg-gray-950">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8 text-stone-800 dark:text-stone-100">Visualização do Cardápio</h1>
+        <h1 className="text-3xl font-bold mb-8 text-stone-800 dark:text-stone-100">{labels?.title ?? 'Visualização do Cardápio'}</h1>
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Mobile Mockup */}
@@ -356,7 +372,7 @@ export default function PreviewClient({
                             : 'bg-gradient-to-br from-white/60 to-gray-100/40 border border-gray-200/40 hover:border-gray-300/60'
                         }`}>
                           <p className={`font-bold text-xs mb-2.5 flex items-center gap-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>
-                            <FiX className="w-4 h-4" /> Pagamento
+                            <FiX className="w-4 h-4" /> {labels?.payment ?? 'Pagamento'}
                           </p>
                           <div className="flex flex-wrap gap-1.5">
                             {restaurant.payment_settings.methods.map((method: string) => (
@@ -433,7 +449,7 @@ export default function PreviewClient({
                             : 'bg-gradient-to-br from-white/60 to-gray-100/40 border border-gray-200/40 hover:border-gray-300/60'
                         }`}>
                           <p className={`font-bold text-xs mb-2.5 flex items-center justify-center gap-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>
-                            <FiMessageCircle className="w-4 h-4" /> Redes Sociais
+                            <FiMessageCircle className="w-4 h-4" /> {labels?.socialMedia ?? 'Redes Sociais'}
                           </p>
                           <div className="flex flex-wrap gap-2 justify-center">
                             {restaurant.social_media.instagram && (
@@ -514,14 +530,14 @@ export default function PreviewClient({
             {/* Theme Toggle */}
             <div className="bg-white/80 dark:bg-white/5 border-2 border-amber-500/20 rounded-2xl shadow-xl backdrop-blur-xl p-6">
               <h3 className="text-sm font-semibold text-stone-800 dark:text-stone-100 mb-3">
-                Tema do Preview
+                {labels?.selectTheme ?? 'Tema do Preview'}
               </h3>
               <button
                 onClick={() => setIsDarkMode(!isDarkMode)}
                 className="w-full flex items-center justify-between p-3 rounded-lg transition-colors bg-stone-50 dark:bg-white/5 hover:bg-stone-100 dark:hover:bg-white/10"
               >
                 <span className="text-sm font-medium text-stone-700 dark:text-stone-300">
-                  {isDarkMode ? 'Modo Escuro' : 'Modo Claro'}
+                  {isDarkMode ? (labels?.darkMode ?? 'Modo Escuro') : (labels?.lightMode ?? 'Modo Claro')}
                 </span>
                 {isDarkMode ? (
                   <FiMoon className="w-5 h-5 text-stone-700 dark:text-stone-300" />
@@ -545,10 +561,10 @@ export default function PreviewClient({
                     </div>
                     <div className="text-left">
                       <h3 className="text-base font-bold text-stone-800 dark:text-stone-100">
-                        Cor do Cardápio
+                        {labels?.menuColor ?? 'Cor do Cardápio'}
                       </h3>
                       <p className="text-xs text-stone-600 dark:text-stone-400">
-                        Personalize o tema visual
+                        {labels?.subtitle ?? 'Personalize o tema visual'}
                       </p>
                     </div>
                   </div>
@@ -650,7 +666,7 @@ export default function PreviewClient({
                     </div>
                     <div className="text-left">
                       <h3 className="text-base font-bold text-stone-800 dark:text-stone-100">
-                        Informações
+                        {labels?.information ?? 'Informações'}
                       </h3>
                       <p className="text-xs text-stone-600 dark:text-stone-400">
                         Dados do restaurante

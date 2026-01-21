@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import EditDishModal from './EditDishModal'
 import DishSearch from './DishSearch'
+import { useTranslation } from '@/components/providers/I18nProvider'
 
 interface MenuDishesListProps {
   dishes: any[]
@@ -11,6 +12,7 @@ interface MenuDishesListProps {
 }
 
 export default function MenuDishesList({ dishes, categories, restaurantId }: MenuDishesListProps) {
+  const { t } = useTranslation()
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredDishes = dishes.filter(dish => {
@@ -36,7 +38,7 @@ export default function MenuDishesList({ dishes, categories, restaurantId }: Men
       {groupedByCategory.length === 0 ? (
         <div className="bg-white/85 dark:bg-white/5 border-2 border-amber-500/20 rounded-2xl shadow-xl backdrop-blur-xl p-12 text-center">
           <p className="text-stone-600 dark:text-stone-400">
-            {searchQuery ? 'Nenhum prato encontrado com esse nome.' : 'Nenhum prato cadastrado ainda.'}
+            {searchQuery ? t('menu.noDishesFound') : t('menu.noDishesAdded')}
           </p>
         </div>
       ) : (
@@ -51,8 +53,8 @@ export default function MenuDishesList({ dishes, categories, restaurantId }: Men
               </h2>
               <p className="text-sm text-stone-600 dark:text-stone-400 mt-1">
                 {typeof category.description === 'object' 
-                  ? (category.description?.['pt-BR'] || category.description?.['en'] || 'Listagem de pratos')
-                  : (category.description || 'Listagem de pratos')
+                  ? (category.description?.['pt-BR'] || category.description?.['en'] || t('menu.categoryItems'))
+                  : (category.description || t('menu.categoryItems'))
                 }
               </p>
             </div>

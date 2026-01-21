@@ -93,11 +93,6 @@ export default async function DashboardPage({
   const todayOrdersCount = todayOrders?.length || 0
   const todayRevenue = todayOrders?.reduce((sum, order: any) => sum + parseFloat(order.total_amount.toString()), 0) || 0
 
-  const { count: activeTablesCount } = await supabase
-    .from('tables')
-    .select('*', { count: 'exact', head: true })
-    .eq('restaurant_id', (restaurant as any).id)
-    .eq('is_occupied', true)
 
   // Recent orders
   const { data: recentOrders } = await supabase
@@ -186,7 +181,6 @@ export default async function DashboardPage({
       availableMonths={monthsForSelect}
       todayOrdersCount={todayOrdersCount}
       todayRevenue={todayRevenue}
-      activeTablesCount={activeTablesCount || 0}
       chartData={chartData}
       topDishSeries={topDishSeries}
       daysInMonth={daysInMonth}

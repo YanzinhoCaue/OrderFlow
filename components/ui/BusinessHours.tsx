@@ -1,6 +1,7 @@
 'use client'
 
 import { FiToggleLeft, FiToggleRight } from 'react-icons/fi'
+import { useTranslation } from '@/components/providers/I18nProvider'
 
 export type BusinessHour = {
   day: string
@@ -15,16 +16,18 @@ interface BusinessHoursProps {
 }
 
 const DAYS = [
-  { key: 'monday', label: 'Segunda-feira' },
-  { key: 'tuesday', label: 'Terça-feira' },
-  { key: 'wednesday', label: 'Quarta-feira' },
-  { key: 'thursday', label: 'Quinta-feira' },
-  { key: 'friday', label: 'Sexta-feira' },
-  { key: 'saturday', label: 'Sábado' },
-  { key: 'sunday', label: 'Domingo' },
+  { key: 'monday', labelKey: 'common.monday' },
+  { key: 'tuesday', labelKey: 'common.tuesday' },
+  { key: 'wednesday', labelKey: 'common.wednesday' },
+  { key: 'thursday', labelKey: 'common.thursday' },
+  { key: 'friday', labelKey: 'common.friday' },
+  { key: 'saturday', labelKey: 'common.saturday' },
+  { key: 'sunday', labelKey: 'common.sunday' },
 ]
 
 export default function BusinessHours({ hours, onChange }: BusinessHoursProps) {
+  const { t } = useTranslation()
+  
   const updateHour = (index: number, field: keyof BusinessHour, value: string | boolean) => {
     const newHours = [...hours]
     newHours[index] = { ...newHours[index], [field]: value }
@@ -36,7 +39,7 @@ export default function BusinessHours({ hours, onChange }: BusinessHoursProps) {
       {hours.map((hour, index) => (
         <div key={hour.day} className="p-4 bg-stone-50 dark:bg-white/5 rounded-lg border border-stone-200 dark:border-stone-700">
           <div className="flex items-center justify-between mb-3">
-            <span className="font-medium text-stone-700 dark:text-stone-300">{DAYS[index].label}</span>
+            <span className="font-medium text-stone-700 dark:text-stone-300">{t(DAYS[index].labelKey)}</span>
             <button
               type="button"
               onClick={() => updateHour(index, 'closed', !hour.closed)}
@@ -45,12 +48,12 @@ export default function BusinessHours({ hours, onChange }: BusinessHoursProps) {
               {hour.closed ? (
                 <>
                   <FiToggleLeft className="w-5 h-5 text-stone-400" />
-                  <span className="text-stone-500 dark:text-stone-400">Fechado</span>
+                  <span className="text-stone-500 dark:text-stone-400">{t('common.closed')}</span>
                 </>
               ) : (
                 <>
                   <FiToggleRight className="w-5 h-5 text-amber-500" />
-                  <span className="text-amber-600 dark:text-amber-400">Aberto</span>
+                  <span className="text-amber-600 dark:text-amber-400">{t('common.open')}</span>
                 </>
               )}
             </button>
@@ -59,7 +62,7 @@ export default function BusinessHours({ hours, onChange }: BusinessHoursProps) {
           {!hour.closed && (
             <div className="flex gap-3 items-center">
               <div className="flex-1">
-                <label className="text-xs text-stone-600 dark:text-stone-400 block mb-1">Abertura</label>
+                <label className="text-xs text-stone-600 dark:text-stone-400 block mb-1">{t('common.openingTime')}</label>
                 <input
                   type="time"
                   value={hour.openTime}
@@ -68,7 +71,7 @@ export default function BusinessHours({ hours, onChange }: BusinessHoursProps) {
                 />
               </div>
               <div className="flex-1">
-                <label className="text-xs text-stone-600 dark:text-stone-400 block mb-1">Fechamento</label>
+                <label className="text-xs text-stone-600 dark:text-stone-400 block mb-1">{t('common.closingTime')}</label>
                 <input
                   type="time"
                   value={hour.closeTime}

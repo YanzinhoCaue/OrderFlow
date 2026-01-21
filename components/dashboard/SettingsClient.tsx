@@ -42,9 +42,52 @@ const RUSTIC_COLORS = [
 export default function SettingsClient({
   restaurant,
   profile,
+  labels,
 }: {
   restaurant: Restaurant
   profile: Profile
+  labels?: {
+    title: string
+    heading: string
+    subtitle: string
+    personalInfo: string
+    ownerName: string
+    ownerPhone: string
+    cpfCnpj: string
+    restaurantInfo: string
+    restaurantName: string
+    restaurantPhone: string
+    description: string
+    branding: string
+    logo: string
+    cover: string
+    themeColor: string
+    businessHours: string
+    monday: string
+    tuesday: string
+    wednesday: string
+    thursday: string
+    friday: string
+    saturday: string
+    sunday: string
+    openTime: string
+    closeTime: string
+    closed: string
+    socialMedia: string
+    instagram: string
+    facebook: string
+    whatsapp: string
+    twitter: string
+    tiktok: string
+    paymentMethods: string
+    acceptsCash: string
+    serviceFee: string
+    pixKey: string
+    save: string
+    saveChanges: string
+    success: string
+    error: string
+  }
 }) {
   console.log('[SettingsClient] restaurant:', restaurant)
   console.log('[SettingsClient] restaurant.id:', restaurant.id, 'type:', typeof restaurant.id)
@@ -187,12 +230,12 @@ export default function SettingsClient({
       })
 
       if (!response.ok) {
-        setMessage('Erro ao salvar alterações')
+        setMessage(labels?.error ?? 'Erro ao salvar alterações')
         return
       }
 
       const updated = await response.json()
-      setMessage('Configurações salvas com sucesso')
+      setMessage(labels?.success ?? 'Configurações salvas com sucesso')
       window.scrollTo(0, 0)
       setFormData((prev) => ({
         ...prev,
@@ -207,7 +250,7 @@ export default function SettingsClient({
         cpfCnpj: updated.profile.cpf_cnpj || '',
       }))
     } catch (error) {
-      setMessage('Erro inesperado ao salvar')
+      setMessage(labels?.error ?? 'Erro inesperado ao salvar')
       console.error(error)
     } finally {
       setIsSaving(false)
@@ -218,12 +261,12 @@ export default function SettingsClient({
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-white/80 dark:bg-white/5 border-2 border-amber-500/20 rounded-2xl px-6 py-4 shadow-xl backdrop-blur-xl">
         <div>
-          <p className="text-sm text-stone-600 dark:text-stone-400">Gestão de configurações</p>
+          <p className="text-sm text-stone-600 dark:text-stone-400">{labels?.heading ?? 'Gestão de configurações'}</p>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-[#b45309] via-[#d97706] to-[#f59e0b] dark:from-amber-200 dark:via-amber-400 dark:to-orange-500 bg-clip-text text-transparent">
-            Configurações do Restaurante
+            {labels?.title ?? 'Configurações do Restaurante'}
           </h1>
           <p className="text-xs text-stone-500 dark:text-stone-500 mt-1">
-            Mesmas opções do cadastro para atualizar dados e identidade visual
+            {labels?.subtitle ?? 'Mesmas opções do cadastro para atualizar dados e identidade visual'}
           </p>
         </div>
         <button
@@ -232,7 +275,7 @@ export default function SettingsClient({
           className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-xl shadow-lg hover:from-amber-600 hover:to-orange-600 transition-colors disabled:opacity-60"
         >
           <FiSave className="w-4 h-4" />
-          {isSaving ? 'Salvando...' : 'Salvar alterações'}
+          {isSaving ? (labels?.save ?? 'Salvando...') : (labels?.saveChanges ?? 'Salvar alterações')}
         </button>
       </div>
 
@@ -252,7 +295,7 @@ export default function SettingsClient({
           >
             <div className="flex items-center gap-2 text-stone-800 dark:text-white">
               <FiImage className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-semibold">Identidade do restaurante</h2>
+              <h2 className="text-lg font-semibold">{labels?.restaurantInfo ?? 'Identidade do restaurante'}</h2>
             </div>
             <FiChevronDown
               className={`w-5 h-5 text-stone-600 dark:text-stone-400 transition-transform ${
@@ -265,7 +308,7 @@ export default function SettingsClient({
             <div className="px-6 pb-6 space-y-4 border-t border-amber-500/10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 <div>
-                  <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300 mb-2">Nome *</label>
+                  <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300 mb-2">{labels?.restaurantName ?? 'Nome *'}</label>
                   <input
                     type="text"
                     value={formData.restaurantName}
@@ -276,7 +319,7 @@ export default function SettingsClient({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300 mb-2">Telefone *</label>
+                  <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300 mb-2">{labels?.restaurantPhone ?? 'Telefone *'}</label>
                   <input
                     type="tel"
                     value={formData.restaurantPhone}
@@ -288,7 +331,7 @@ export default function SettingsClient({
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300 mb-2">Descrição</label>
+                <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300 mb-2">{labels?.description ?? 'Descrição'}</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => handleChange('description', e.target.value)}
@@ -367,7 +410,7 @@ export default function SettingsClient({
             <div className="px-6 pb-6 space-y-4 border-t border-amber-500/10 mt-0 pt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300 mb-2">Nome *</label>
+                  <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300 mb-2">{labels?.ownerName ?? 'Nome'} *</label>
                   <input
                     type="text"
                     value={formData.ownerName}
@@ -378,7 +421,7 @@ export default function SettingsClient({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300 mb-2">Telefone</label>
+                  <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300 mb-2">{labels?.ownerPhone ?? 'Telefone'}</label>
                   <div className="relative">
                     <FiSmartphone className="absolute left-3 top-3 text-stone-400" />
                     <input
@@ -392,7 +435,7 @@ export default function SettingsClient({
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300 mb-2">Documento *</label>
+                <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300 mb-2">{labels?.cpfCnpj ?? 'Documento'} *</label>
                 <div className="flex gap-2 mb-3">
                   <label className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 cursor-pointer transition" style={{
                     borderColor: formData.documentType === 'cpf' ? '#F59E0B' : '#D1D5DB',
@@ -445,7 +488,7 @@ export default function SettingsClient({
           >
             <div className="flex items-center gap-2 text-stone-800 dark:text-white">
               <FiClock className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-semibold">Horário de funcionamento</h2>
+              <h2 className="text-lg font-semibold">{labels?.businessHours ?? 'Horário de funcionamento'}</h2>
             </div>
             <FiChevronDown
               className={`w-5 h-5 text-stone-600 dark:text-stone-400 transition-transform ${
@@ -473,7 +516,7 @@ export default function SettingsClient({
           >
             <div className="flex items-center gap-2 text-stone-800 dark:text-white">
               <FiShare2 className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-semibold">Redes sociais</h2>
+              <h2 className="text-lg font-semibold">{labels?.socialMedia ?? 'Redes sociais'}</h2>
             </div>
             <FiChevronDown
               className={`w-5 h-5 text-stone-600 dark:text-stone-400 transition-transform ${
@@ -501,7 +544,7 @@ export default function SettingsClient({
           >
             <div className="flex items-center gap-2 text-stone-800 dark:text-white">
               <FiDollarSign className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-semibold">Formas de pagamento e taxas</h2>
+              <h2 className="text-lg font-semibold">{labels?.paymentMethods ?? 'Formas de pagamento e taxas'}</h2>
             </div>
             <FiChevronDown
               className={`w-5 h-5 text-stone-600 dark:text-stone-400 transition-transform ${
@@ -527,7 +570,7 @@ export default function SettingsClient({
             className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-5 py-3 rounded-xl shadow-lg hover:from-amber-600 hover:to-orange-600 transition-colors disabled:opacity-60"
           >
             <FiSave className="w-4 h-4" />
-            {isSaving ? 'Salvando...' : 'Salvar alterações'}
+            {isSaving ? (labels?.saving ?? 'Salvando...') : (labels?.saveChanges ?? 'Salvar alterações')}
           </button>
         </div>
       </form>

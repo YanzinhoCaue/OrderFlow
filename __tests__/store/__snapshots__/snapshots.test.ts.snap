@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Redux State Snapshots should match auth snapshot 1`] = `
+{
+  "error": null,
+  "isAuthenticated": true,
+  "isLoading": false,
+  "user": {
+    "email": "test@example.com",
+    "id": "user-1",
+    "name": "John Doe",
+    "roleType": "customer",
+  },
+}
+`;
+
+exports[`Redux State Snapshots should match cart snapshot 1`] = `
+{
+  "items": [
+    {
+      "dishId": "pizza-1",
+      "dishName": "Pizza",
+      "id": "1",
+      "ingredients": [],
+      "price": 50,
+      "quantity": 1,
+    },
+  ],
+  "totalItems": 1,
+  "totalPrice": 50,
+}
+`;

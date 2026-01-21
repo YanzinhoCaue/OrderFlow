@@ -4,12 +4,19 @@ import LoginButton from '@/components/auth/LoginButton'
 import ThemeSwitcher from '@/components/shared/ThemeSwitcher'
 import { FiZap, FiClock, FiUsers, FiGlobe } from 'react-icons/fi'
 
-export default async function LoginPage() {
+interface Props {
+  searchParams: Promise<{
+    redirect?: string
+  }>
+}
+
+export default async function LoginPage({ searchParams }: Props) {
+  const { redirect: redirectUrl } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (user) {
-    redirect('/')
+    redirect(redirectUrl || '/dashboard')
   }
 
   return (
@@ -110,7 +117,7 @@ export default async function LoginPage() {
                 </p>
               </div>
 
-              <LoginButton />
+              <LoginButton redirectUrl={redirectUrl} />
 
               <div className="mt-8 pt-6 border-t border-amber-500/20 dark:border-white/10">
                 <p className="text-center text-sm text-stone-600 dark:text-stone-400">

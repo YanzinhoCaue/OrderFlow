@@ -1,7 +1,14 @@
 import { createClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
+import { getDictionary, translate } from '@/lib/i18n/server'
 import PreviewClient from '@/components/dashboard/PreviewClient'
 
 export default async function PreviewPage() {
+  const cookieStore = await cookies()
+  const locale = (cookieStore.get('locale')?.value as any) || 'pt-BR'
+  const dict = await getDictionary(locale)
+  const t = (key: string) => translate(dict, key)
+
   const supabase = await createClient()
   const {
     data: { user },
@@ -25,7 +32,7 @@ export default async function PreviewPage() {
     .single()
 
   if (!restaurant) {
-    return <div>Restaurante não encontrado</div>
+    return <div>{t('common.error')}</div>
   }
 
   // Normalize restaurant fields (handle multilingual objects)
@@ -38,7 +45,7 @@ export default async function PreviewPage() {
   }
 
   const normalizedRestaurant = {
-    ...restaurant,
+    ...(restaurant as Record<string, any>),
     name: normalizeField(restaurant.name),
     description: normalizeField(restaurant.description),
     cpf_cnpj: profile?.cpf_cnpj || null,
@@ -73,5 +80,24 @@ export default async function PreviewPage() {
     }))
   }
 
-  return <PreviewClient restaurant={normalizedRestaurant} categories={normalizedCategories} dishes={allDishes} />
+  return <PreviewClient 
+    restaurant={normalizedRestaurant} 
+    categories={normalizedCategories} 
+    dishes={allDishes}
+    labels={{
+      title: t('dashboardPreview.title'),
+      heading: t('dashboardPreview.heading'),
+      subtitle: t('dashboardPreview.subtitle'),
+      selectLanguage: t('dashboardPreview.selectLanguage'),
+      selectTheme: t('dashboardPreview.selectTheme'),
+      previewMenu: t('dashboardPreview.previewMenu'),
+      menuColor: t('dashboardPreview.menuColor'),
+      lightMode: t('dashboardPreview.lightMode'),
+      darkMode: t('dashboardPreview.darkMode'),
+      statistics: t('dashboardPreview.statistics'),
+      information: t('dashboardPreview.information'),
+      payment: t('dashboardPreview.payment'),
+      socialMedia: t('dashboardPreview.socialMedia'),
+    }}
+  />
 }

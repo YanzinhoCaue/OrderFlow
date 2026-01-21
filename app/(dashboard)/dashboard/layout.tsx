@@ -2,6 +2,9 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import DashboardSidebar from '@/components/dashboard/Sidebar'
 import DashboardHeader from '@/components/dashboard/Header'
+import { SidebarProvider } from '@/components/dashboard/SidebarContext'
+import { MobileMenuProvider } from '@/components/dashboard/MobileMenuContext'
+import DashboardLayoutClient from './DashboardLayoutClient'
 
 export default async function DashboardLayout({
   children,
@@ -36,14 +39,18 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <DashboardSidebar restaurant={restaurant} />
-      <div className="lg:pl-64">
-        <DashboardHeader user={user} restaurant={restaurant} />
-        <main className="p-6">
-          {children}
-        </main>
-      </div>
-    </div>
+    <SidebarProvider>
+      <MobileMenuProvider>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <DashboardSidebar restaurant={restaurant} />
+          <DashboardLayoutClient>
+            <DashboardHeader user={user} restaurant={restaurant} />
+            <main className="p-4 sm:p-6">
+              {children}
+            </main>
+          </DashboardLayoutClient>
+        </div>
+      </MobileMenuProvider>
+    </SidebarProvider>
   )
 }

@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button'
 import { updateTable, deleteTable, generateTableQRCode } from '@/app/actions/tables'
 import { cn } from '@/lib/utils/cn'
 import ImageUpload from '@/components/ui/ImageUpload'
+import { useTranslation } from '@/components/providers/I18nProvider'
 
 interface EditTableModalProps {
   table: {
@@ -26,6 +27,7 @@ interface EditTableModalProps {
 
 export default function EditTableModal({ table, children }: EditTableModalProps) {
   const router = useRouter()
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -253,7 +255,7 @@ export default function EditTableModal({ table, children }: EditTableModalProps)
                     <div className="flex items-center gap-3">
                       <div className={`h-3 w-3 rounded-full ${isActive ? 'bg-green-500' : 'bg-red-500'}`} />
                       <span className="text-sm text-stone-600 dark:text-stone-400">
-                        {isActive ? 'Ativa' : 'Inativa'}
+                        {isActive ? t('common.active') : t('common.inactive')}
                       </span>
                     </div>
                   </div>
