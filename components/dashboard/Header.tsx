@@ -1,6 +1,6 @@
 'use client'
 
-import { signOut } from '@/app/actions/auth'
+import { createClient } from '@/lib/supabase/client'
 import { FiLogOut, FiMoon, FiSun, FiMenu, FiX } from 'react-icons/fi'
 import { useTheme } from '@/components/providers/ThemeProvider'
 import { useTranslation } from '@/components/providers/I18nProvider'
@@ -18,6 +18,17 @@ export default function DashboardHeader({ user, restaurant }: HeaderProps) {
   const { theme, toggleTheme } = useTheme()
   const { locale, setLocale } = useTranslation()
   const { isOpen, setIsOpen } = useMobileMenu()
+  const supabase = createClient()
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut()
+    } catch (error) {
+      console.error('Error signing out:', error)
+    } finally {
+      window.location.href = '/login'
+    }
+  }
 
   return (
     <header className="sticky top-0 z-[9998] flex h-14 sm:h-16 shrink-0 items-center gap-x-1 min-[400px]:gap-x-2 sm:gap-x-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-1.5 min-[400px]:px-2 sm:px-4 shadow-sm sm:gap-x-6 lg:px-8">
@@ -84,11 +95,9 @@ export default function DashboardHeader({ user, restaurant }: HeaderProps) {
             <span className="hidden md:block text-sm font-medium text-gray-700 dark:text-gray-300 truncate max-w-[120px] lg:max-w-none">
               {user.user_metadata.name || user.email}
             </span>
-            <form action={signOut}>
-              <Button variant="ghost" size="sm" type="submit">
-                <FiLogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              </Button>
-            </form>
+            <Button variant="ghost" size="sm" type="button" onClick={handleSignOut}>
+              <FiLogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </Button>
           </div>
         </div>
       </div>
