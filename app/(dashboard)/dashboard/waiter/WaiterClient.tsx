@@ -10,6 +10,21 @@ import { OrderStatus } from '@/lib/supabase/types'
 import { createClient } from '@/lib/supabase/client'
 import { markNotificationRead } from '@/app/actions/notifications'
 
+interface WaiterNotification {
+  id: string
+  type: string
+  message: string
+  read: boolean
+  created_at: string
+  order_id?: string
+  orders?: {
+    order_number: number
+    tables?: {
+      table_number: string
+    }
+  }
+}
+
 interface OrderItem {
   id: string
   quantity: number
@@ -34,7 +49,7 @@ interface Order {
 }
 
 interface WaiterClientProps {
-  notifications: Notification[]
+  notifications: WaiterNotification[]
   restaurantId: string
   labels?: {
     title: string
@@ -62,7 +77,7 @@ interface WaiterClientProps {
 
 export default function WaiterClient({ notifications, restaurantId, labels }: WaiterClientProps) {
   const supabase = createClient()
-  const [list, setList] = useState<Notification[]>(notifications)
+  const [list, setList] = useState<WaiterNotification[]>(notifications)
   const [search, setSearch] = useState('')
   const [onlyUnread, setOnlyUnread] = useState(false)
   const [pendingId, setPendingId] = useState<string | null>(null)
@@ -177,7 +192,7 @@ export default function WaiterClient({ notifications, restaurantId, labels }: Wa
         schema: 'public',
         table: 'notifications',
         filter: `restaurant_id=eq.${restaurantId}`,
-      }, (payload) => {
+      }, (payload: any) => {
         console.log('🔔 [GARÇOM] Notificação recebida:', payload)
         if (payload.eventType === 'INSERT') {
           setList((prev) => [payload.new as any, ...prev])
