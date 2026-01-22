@@ -60,13 +60,14 @@ export default async function PreviewPage() {
   }
 
   // Fetch categories
-  const { data: categories } = await supabase
+  const { data: categories } = await (supabase as any)
     .from('categories')
     .select('*')
     .eq('restaurant_id', restaurantData.id)
 
+  type CategoryRow = Database['public']['Tables']['categories']['Row']
   // Normalize categories
-  const normalizedCategories = (categories || []).map((cat) => ({
+  const normalizedCategories = ((categories || []) as CategoryRow[]).map((cat) => ({
     ...cat,
     name: normalizeField(cat.name),
   }))
@@ -74,13 +75,14 @@ export default async function PreviewPage() {
   // Fetch dishes for each category
   let allDishes: any[] = []
   if (normalizedCategories && normalizedCategories.length > 0) {
-    const { data: dishes } = await supabase
+    const { data: dishes } = await (supabase as any)
       .from('dishes')
       .select('*')
       .eq('restaurant_id', restaurantData.id)
       .eq('is_available', true)
 
-    allDishes = (dishes || []).map((dish) => ({
+    type DishRow = Database['public']['Tables']['dishes']['Row']
+    allDishes = ((dishes || []) as DishRow[]).map((dish) => ({
       ...dish,
       name: normalizeField(dish.name),
       description: normalizeField(dish.description),

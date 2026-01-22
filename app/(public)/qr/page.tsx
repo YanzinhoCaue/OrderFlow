@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Database } from '@/lib/supabase/types'
 
 export default function QRScanPage() {
   const router = useRouter()
@@ -23,7 +24,7 @@ export default function QRScanPage() {
       const supabase = createClient()
 
       // Get table by token
-      const { data: table, error: tableError } = await supabase
+      const { data: table, error: tableError } = await (supabase as any)
         .from('tables')
         .select('restaurant_id, restaurants(slug)')
         .eq('qr_code_token', qrToken.trim())
@@ -37,8 +38,9 @@ export default function QRScanPage() {
       }
 
       // Redirect to menu
-      const slug = (table.restaurants as any).slug
-      router.push(`/menu/${slug}/${qrToken.trim()}`)
+      type TableWithRestaurant = Database['public']['Tables']['tables']['Row'] & { restaurants: { slug: string } }
+      const tableData = table as TableWithRestaurant
+      router.push(`/menu/${tableData.restaurants.slug}/${qrToken.trim()}`)
     } catch (err) {
       console.error('Error validating QR code:', err)
       setError('Erro ao ler QR code. Tente novamente.')
