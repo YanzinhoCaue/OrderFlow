@@ -70,13 +70,4 @@ migrations/       # migrações SQL
 ## 🌍 Idiomas
 
 - pt-BR, en, es, zh, ja — trocador disponível no header (dashboard) e no cardápio público
-
-## 🔧 Troubleshooting rápido
-
-- Erro de hidratação `<span> dentro de <option>`: já ajustado (opções só texto)
-- Erro de `<button>` aninhado: removido no fluxo de QR Code das mesas
-- Textos do sidebar sumindo em 320px: colapso é resetado em telas < 1024px
-
-## 📜 Licença
-
 MIT
