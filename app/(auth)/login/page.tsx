@@ -11,9 +11,24 @@ interface Props {
 }
 
 export default async function LoginPage({ searchParams }: Props) {
-  const { redirect: redirectUrl } = await searchParams
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  let redirectUrl: string | undefined
+  let user: any = null
+
+  try {
+    const params = await searchParams
+    redirectUrl = params.redirect
+  } catch (error) {
+    console.error('Error reading searchParams:', error)
+  }
+
+  try {
+    const supabase = await createClient()
+    const { data: { user: authUser } } = await supabase.auth.getUser()
+    user = authUser
+  } catch (error) {
+    console.error('Error getting user from Supabase:', error)
+    // Continue rendering login page if auth check fails
+  }
 
   if (user) {
     redirect(redirectUrl || '/dashboard')
