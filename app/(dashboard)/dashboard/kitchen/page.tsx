@@ -82,7 +82,7 @@ export default function KitchenPage() {
         schema: 'public',
         table: 'notifications',
         filter: `target=eq.kitchen`,
-      }, (payload) => {
+      }, (payload: any) => {
         console.log('🔔 [COZINHA] Notificação recebida via Realtime:', payload)
         console.log('   - Event Type:', payload.eventType)
         console.log('   - Target:', payload.new?.target)
