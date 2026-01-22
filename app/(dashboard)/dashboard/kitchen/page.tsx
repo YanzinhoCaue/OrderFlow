@@ -279,7 +279,7 @@ export default function KitchenPage() {
   const handleDeleteNotification = async (notificationId: string) => {
     try {
       // Marca como lida e remove apenas da lista local (não toca em pedidos)
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('notifications')
         .update({ read: true })
         .eq('id', notificationId)
@@ -298,7 +298,7 @@ export default function KitchenPage() {
     try {
       const notificationIds = notifications.map(n => n.id)
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('notifications')
         .update({ read: true })
         .in('id', notificationIds)
