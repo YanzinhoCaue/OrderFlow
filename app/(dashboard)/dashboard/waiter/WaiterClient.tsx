@@ -192,14 +192,15 @@ export default function WaiterClient({ notifications, restaurantId, labels }: Wa
         schema: 'public',
         table: 'notifications',
         filter: `restaurant_id=eq.${restaurantId}`,
-      }, (payload: any) => {
-        console.log('🔔 [GARÇOM] Notificação recebida:', payload)
-        if (payload.eventType === 'INSERT') {
-          setList((prev) => [payload.new as any, ...prev])
-        } else if (payload.eventType === 'UPDATE') {
-          setList((prev) => prev.map((n) => n.id === (payload.new as any).id ? (payload.new as any) : n))
-        } else if (payload.eventType === 'DELETE') {
-          setList((prev) => prev.filter((n) => n.id !== (payload.old as any).id))
+      }, (payload) => {
+        const data = payload as any
+        console.log('🔔 [GARÇOM] Notificação recebida:', data)
+        if (data.eventType === 'INSERT') {
+          setList((prev) => [data.new as any, ...prev])
+        } else if (data.eventType === 'UPDATE') {
+          setList((prev) => prev.map((n) => n.id === (data.new as any).id ? (data.new as any) : n))
+        } else if (data.eventType === 'DELETE') {
+          setList((prev) => prev.filter((n) => n.id !== (data.old as any).id))
         }
       })
       .subscribe((status) => {

@@ -106,12 +106,13 @@ export default function MenuPageClient({ user, table, restaurant, categories, di
           filter: `order_id=eq.${lastOrderId}`,
         },
         (payload: any) => {
-          console.log('📨 [CLIENTE] Notificação recebida do Realtime:', payload)
-          console.log('   - Target:', payload.new.target)
-          console.log('   - Type:', payload.new.type)
-          console.log('   - Message:', payload.new.message)
+          const data = payload as any
+          console.log('📨 [CLIENTE] Notificação recebida do Realtime:', data)
+          console.log('   - Target:', data.new?.target)
+          console.log('   - Type:', data.new?.type)
+          console.log('   - Message:', data.new?.message)
           
-          const notification = payload.new
+          const notification = data.new
           
           // Filter only customer notifications
           if (notification.target === 'customer') {
@@ -169,7 +170,8 @@ export default function MenuPageClient({ user, table, restaurant, categories, di
           filter: `id=eq.${lastOrderId}`,
         },
         (payload: any) => {
-          const nextStatus = payload.new?.status
+          const data = payload as any
+          const nextStatus = data.new?.status
           if (nextStatus === 'delivered') {
             console.log('📦 [CLIENTE] Pedido marcado como entregue - abrindo avaliação')
             handleDeliveredStatus(lastOrderId)
