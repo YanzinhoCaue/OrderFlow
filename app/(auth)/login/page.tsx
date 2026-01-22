@@ -4,22 +4,20 @@ import LoginButton from '@/components/auth/LoginButton'
 import ThemeSwitcher from '@/components/shared/ThemeSwitcher'
 import { FiZap, FiClock, FiUsers, FiGlobe } from 'react-icons/fi'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
-  searchParams: Promise<{
+  searchParams?: {
     redirect?: string
-  }>
+  }
 }
 
 export default async function LoginPage({ searchParams }: Props) {
   let redirectUrl: string | undefined
   let user: any = null
 
-  try {
-    const params = await searchParams
-    redirectUrl = params.redirect
-  } catch (error) {
-    console.error('Error reading searchParams:', error)
-  }
+  // searchParams is a plain object in App Router (not a Promise)
+  redirectUrl = searchParams?.redirect
 
   try {
     const supabase = await createClient()
