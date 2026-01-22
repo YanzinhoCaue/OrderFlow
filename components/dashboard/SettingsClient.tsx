@@ -32,6 +32,10 @@ type Restaurant = {
   logo_url: string | null
   cover_url: string | null
   theme_color: string
+  business_hours?: any
+  social_media?: any
+  payment_settings?: any
+  pix_key?: string | null
 }
 
 const RUSTIC_COLORS = [
@@ -84,6 +88,7 @@ export default function SettingsClient({
     serviceFee: string
     pixKey: string
     save: string
+    saving: string
     saveChanges: string
     success: string
     error: string

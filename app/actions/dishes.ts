@@ -9,7 +9,7 @@ import { revalidatePath } from 'next/cache'
 export async function getDishes(restaurantId: string) {
   const supabase = await createClient()
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('dishes')
     .select(`
       *,
@@ -37,7 +37,7 @@ export async function getDishes(restaurantId: string) {
 export async function getDish(dishId: string) {
   const supabase = await createClient()
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('dishes')
     .select(`
       *,
@@ -83,7 +83,7 @@ export async function createDish(data: {
     const supabase = await createClient()
 
     // Create dish
-    const { data: dish, error: dishError} = await supabase
+    const { data: dish, error: dishError} = await (supabase as any)
       .from('dishes')
       .insert({
         restaurant_id: data.restaurantId,
@@ -112,7 +112,7 @@ export async function createDish(data: {
         is_primary: index === 0,
       }))
 
-      const { error: imageError } = await supabase
+      const { error: imageError } = await (supabase as any)
         .from('dish_images')
         .insert(imageInserts)
 
@@ -130,7 +130,7 @@ export async function createDish(data: {
         is_included_by_default: ing.isIncludedByDefault ?? true,
       }))
 
-      const { error: ingredientError } = await supabase
+      const { error: ingredientError } = await (supabase as any)
         .from('dish_ingredients')
         .insert(ingredientInserts)
 
@@ -159,12 +159,12 @@ export async function createDish(data: {
  * Update dish
  */
 export async function updateDish(
-  dishId: string,
   data: {
+    dishId: string
+    categoryId: string
     name: Record<string, string>
     description?: Record<string, string>
     basePrice: number
-    categoryId: string
     isAvailable?: boolean
     availableDays?: number[]
     images?: string[]
@@ -180,7 +180,7 @@ export async function updateDish(
   try {
     const supabase = await createClient()
 
-    const { data: dish, error } = await supabase
+    const { data: dish, error } = await (supabase as any)
       .from('dishes')
       .update({
         name: data.name,
@@ -190,7 +190,7 @@ export async function updateDish(
         is_available: data.isAvailable,
         available_days: data.availableDays,
       })
-      .eq('id', dishId)
+      .eq('id', data.dishId)
       .select()
       .single()
 
@@ -199,36 +199,36 @@ export async function updateDish(
     // Update images if provided
     if (data.images) {
       // Remove existing images
-      await supabase.from('dish_images').delete().eq('dish_id', dishId)
+      await (supabase as any).from('dish_images').delete().eq('dish_id', data.dishId)
       
       // Add new images
       if (data.images.length > 0) {
         const imageInserts = data.images.map((url, index) => ({
-          dish_id: dishId,
+          dish_id: data.dishId,
           image_url: url,
           display_order: index,
           is_primary: index === 0,
         }))
-        await supabase.from('dish_images').insert(imageInserts)
+        await (supabase as any).from('dish_images').insert(imageInserts)
       }
     }
 
     // Update ingredients if provided
     if (data.ingredients) {
       // Remove existing dish_ingredients
-      await supabase.from('dish_ingredients').delete().eq('dish_id', dishId)
+      await (supabase as any).from('dish_ingredients').delete().eq('dish_id', data.dishId)
       
       // Add new ingredients
       if (data.ingredients.length > 0) {
         const ingredientInserts = data.ingredients.map((ing) => ({
-          dish_id: dishId,
+          dish_id: data.dishId,
           ingredient_id: ing.ingredientId,
           additional_price: ing.additionalPrice || 0,
           is_optional: ing.isOptional ?? true,
           is_removable: ing.isRemovable ?? true,
           is_included_by_default: ing.isIncludedByDefault ?? true,
         }))
-        await supabase.from('dish_ingredients').insert(ingredientInserts)
+        await (supabase as any).from('dish_ingredients').insert(ingredientInserts)
       }
     }
 
@@ -257,7 +257,7 @@ export async function deleteDish(dishId: string) {
   try {
     const supabase = await createClient()
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('dishes')
       .delete()
       .eq('id', dishId)
@@ -288,7 +288,7 @@ export async function addIngredientToDish(
   try {
     const supabase = await createClient()
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('dish_ingredients')
       .insert({
         dish_id: dishId,
@@ -318,7 +318,7 @@ export async function removeIngredientFromDish(dishIngredientId: string) {
   try {
     const supabase = await createClient()
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('dish_ingredients')
       .delete()
       .eq('id', dishIngredientId)

@@ -10,7 +10,7 @@ export async function getWaiterNotifications(restaurantId: string, onlyUnread: b
   const supabase = await createClient()
 
   // Fetch notifications (basic fields only to avoid deep join issues)
-  let notifQuery = supabase
+  let notifQuery = (supabase as any)
     .from('notifications')
     .select('*')
     .eq('restaurant_id', restaurantId)
@@ -31,7 +31,7 @@ export async function getWaiterNotifications(restaurantId: string, onlyUnread: b
   let tablesMap: Record<string, any> = {}
 
   if (orderIds.length > 0) {
-    const { data: orders, error: ordersError } = await supabase
+    const { data: orders, error: ordersError } = await (supabase as any)
       .from('orders')
       .select('id, order_number, status, table_id')
       .in('id', orderIds as string[])
@@ -40,7 +40,7 @@ export async function getWaiterNotifications(restaurantId: string, onlyUnread: b
       ordersMap = orders.reduce((acc, o) => { acc[o.id] = o; return acc }, {} as Record<string, any>)
       const tableIds = orders.map((o) => o.table_id).filter(Boolean)
       if (tableIds.length > 0) {
-        const { data: tables, error: tablesError } = await supabase
+        const { data: tables, error: tablesError } = await (supabase as any)
           .from('tables')
           .select('id, table_number')
           .in('id', tableIds as string[])
@@ -67,7 +67,7 @@ export async function getWaiterNotifications(restaurantId: string, onlyUnread: b
 export async function markNotificationRead(notificationId: string) {
   try {
     const supabase = await createClient()
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('notifications')
       .update({ read: true })
       .eq('id', notificationId)

@@ -51,8 +51,8 @@ export default function ViewDishModal({
 
   const dishName = typeof dish.name === 'object' ? dish.name['pt-BR'] || dish.name.en : dish.name
   const dishDescription = dish.description && typeof dish.description === 'object' 
-    ? dish.description['pt-BR'] || dish.description.en 
-    : dish.description
+    ? (dish.description['pt-BR'] || dish.description.en || '')
+    : (dish.description as unknown as string | null)
 
   return (
     <>

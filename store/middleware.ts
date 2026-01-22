@@ -5,7 +5,7 @@ import { Middleware } from '@reduxjs/toolkit'
  * Registra todas as ações e mudanças de estado
  */
 export const loggerMiddleware: Middleware = (storeAPI) => (next) => (action) => {
-  console.group(action.type)
+  console.group((action as any).type)
   console.info('dispatching', action)
 
   const result = next(action)
@@ -25,13 +25,13 @@ export const persistStateMiddleware: Middleware = (storeAPI) => (next) => (actio
   const state = storeAPI.getState()
 
   // Persistir carrinho
-  if (action.type.startsWith('cart/')) {
-    localStorage.setItem('cart-state', JSON.stringify(state.cart))
+  if ((action as any).type.startsWith('cart/')) {
+    localStorage.setItem('cart-state', JSON.stringify((state as any).cart))
   }
 
   // Persistir autenticação
-  if (action.type.startsWith('auth/')) {
-    localStorage.setItem('auth-state', JSON.stringify(state.auth))
+  if ((action as any).type.startsWith('auth/')) {
+    localStorage.setItem('auth-state', JSON.stringify((state as any).auth))
   }
 
   return result
@@ -46,12 +46,12 @@ export const analyticsMiddleware: Middleware = (storeAPI) => (next) => (action) 
 
   // Rastrear ações específicas
   if (
-    action.type === 'cart/addToCart' ||
-    action.type === 'orders/addOrder' ||
-    action.type === 'auth/setUser'
+    (action as any).type === 'cart/addToCart' ||
+    (action as any).type === 'orders/addOrder' ||
+    (action as any).type === 'auth/setUser'
   ) {
     // Aqui você enviaria para um serviço de analytics
-    console.log('[Analytics]', action.type, action.payload)
+    console.log('[Analytics]', (action as any).type, (action as any).payload)
   }
 
   return result
@@ -65,10 +65,10 @@ export const errorNotificationMiddleware: Middleware = (storeAPI) => (next) => (
   const result = next(action)
 
   if (
-    action.type.endsWith('/rejected') ||
-    action.type.includes('error')
+    (action as any).type.endsWith('/rejected') ||
+    (action as any).type.includes('error')
   ) {
-    console.error('[Error]', action.payload)
+    console.error('[Error]', (action as any).payload)
     // Aqui você mostraria uma notificação visual ao usuário
   }
 

@@ -23,7 +23,7 @@ const normalizeField = (field: any): string => {
 export async function getOrders(restaurantId: string, status?: OrderStatus) {
   const supabase = await createClient()
 
-  let query = supabase
+  let query = (supabase as any)
     .from('orders')
     .select(`
       *,
@@ -100,7 +100,7 @@ export async function createOrder(data: {
     )
 
     // Create order
-    const { data: order, error: orderError } = await supabase
+    const { data: order, error: orderError } = await (supabase as any)
       .from('orders')
       .insert({
         restaurant_id: data.restaurantId,
@@ -117,7 +117,7 @@ export async function createOrder(data: {
 
     // Create order items
     for (const item of data.items) {
-      const { data: orderItem, error: itemError } = await supabase
+      const { data: orderItem, error: itemError } = await (supabase as any)
         .from('order_items')
         .insert({
           order_id: order.id,
@@ -140,7 +140,7 @@ export async function createOrder(data: {
           was_added: true,
         }))
 
-        await supabase.from('order_item_ingredients').insert(addedInserts)
+        await (supabase as any).from('order_item_ingredients').insert(addedInserts)
       }
 
       if (item.removedIngredients && item.removedIngredients.length > 0) {
@@ -150,12 +150,12 @@ export async function createOrder(data: {
           was_added: false,
         }))
 
-        await supabase.from('order_item_ingredients').insert(removedInserts)
+        await (supabase as any).from('order_item_ingredients').insert(removedInserts)
       }
     }
 
     // Create status history
-    await supabase.from('order_status_history').insert({
+    await (supabase as any).from('order_status_history').insert({
       order_id: order.id,
       status: 'pending',
     })
@@ -178,7 +178,7 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
     const user = await getCurrentUser()
 
     // Update order
-    const { data, error: updateError } = await supabase
+    const { data, error: updateError } = await (supabase as any)
       .from('orders')
       .update({ status })
       .eq('id', orderId)
@@ -188,7 +188,7 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
     if (updateError) throw updateError
 
     // Add to status history
-    await supabase.from('order_status_history').insert({
+    await (supabase as any).from('order_status_history').insert({
       order_id: orderId,
       status,
       changed_by: user?.id,
@@ -215,7 +215,7 @@ export async function acceptOrder(orderId: string, prepTimeMinutes: 15 | 30 | 60
     console.log('🎯 acceptOrder iniciado - orderId:', orderId, 'prepTime:', prepTimeMinutes)
 
     // Update order to received and set prep time
-    const { data: order, error: updateError } = await supabase
+    const { data: order, error: updateError } = await (supabase as any)
       .from('orders')
       .update({ status: 'in_preparation' })
       .eq('id', orderId)
@@ -227,7 +227,7 @@ export async function acceptOrder(orderId: string, prepTimeMinutes: 15 | 30 | 60
     console.log('📦 Pedido atualizado:', order.order_number, '- Mesa:', order.tables?.table_number)
 
     // Status history
-    await supabase.from('order_status_history').insert({
+    await (supabase as any).from('order_status_history').insert({
       order_id: orderId,
       status: 'in_preparation',
       changed_by: user?.id,
@@ -245,7 +245,7 @@ export async function acceptOrder(orderId: string, prepTimeMinutes: 15 | 30 | 60
     console.log('   - table_id:', order.table_id)
     console.log('   - order_id:', order.id)
 
-    const { data: notifData, error: notifError } = await supabase.from('notifications').insert([
+    const { data: notifData, error: notifError } = await (supabase as any).from('notifications').insert([
       {
         restaurant_id: order.restaurant_id,
         table_id: order.table_id,
@@ -290,7 +290,7 @@ export async function refuseOrder(orderId: string, reason: string) {
     console.log('👤 User:', user?.id)
 
     console.log('🔄 Atualizando status do pedido para cancelled...')
-    const { data: order, error: updateError } = await supabase
+    const { data: order, error: updateError } = await (supabase as any)
       .from('orders')
       .update({ status: 'cancelled' })
       .eq('id', orderId)
@@ -301,7 +301,7 @@ export async function refuseOrder(orderId: string, reason: string) {
     if (updateError) throw updateError
 
     console.log('📝 Adicionando histórico de status...')
-    await supabase.from('order_status_history').insert({
+    await (supabase as any).from('order_status_history').insert({
       order_id: orderId,
       status: 'cancelled',
       changed_by: user?.id,
@@ -318,7 +318,7 @@ export async function refuseOrder(orderId: string, reason: string) {
     console.log('   - table_id:', order.table_id)
     console.log('   - order_id:', order.id)
 
-    const { data: notifData, error: notifError } = await supabase.from('notifications').insert([
+    const { data: notifData, error: notifError } = await (supabase as any).from('notifications').insert([
       {
         restaurant_id: order.restaurant_id,
         table_id: order.table_id,
@@ -365,7 +365,7 @@ export async function markOrderReady(orderId: string) {
 
     console.log('🎯 markOrderReady iniciado - orderId:', orderId)
 
-    const { data: order, error: updateError } = await supabase
+    const { data: order, error: updateError } = await (supabase as any)
       .from('orders')
       .update({ status: 'ready' })
       .eq('id', orderId)
@@ -376,7 +376,7 @@ export async function markOrderReady(orderId: string) {
 
     console.log('📦 Pedido marcado como pronto:', order.order_number)
 
-    await supabase.from('order_status_history').insert({
+    await (supabase as any).from('order_status_history').insert({
       order_id: orderId,
       status: 'ready',
       changed_by: user?.id,
@@ -393,7 +393,7 @@ export async function markOrderReady(orderId: string) {
     console.log('   - table_id:', order.table_id)
     console.log('   - order_id:', order.id)
 
-    const { data: notifData, error: notifError } = await supabase.from('notifications').insert([
+    const { data: notifData, error: notifError } = await (supabase as any).from('notifications').insert([
       {
         restaurant_id: order.restaurant_id,
         table_id: order.table_id,
@@ -435,11 +435,11 @@ export async function deleteOrder(orderId: string) {
     const supabase = await createClient()
 
     // First delete order items and related data
-    await supabase.from('order_item_ingredients').delete().eq('order_item_id', orderId)
-    await supabase.from('order_items').delete().eq('order_id', orderId)
+    await (supabase as any).from('order_item_ingredients').delete().eq('order_item_id', orderId)
+    await (supabase as any).from('order_items').delete().eq('order_id', orderId)
 
     // Then delete the order itself
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('orders')
       .delete()
       .eq('id', orderId)
@@ -461,7 +461,7 @@ export async function reopenOrder(orderId: string) {
   try {
     const supabase = await createClient()
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('orders')
       .update({ status: 'pending' })
       .eq('id', orderId)

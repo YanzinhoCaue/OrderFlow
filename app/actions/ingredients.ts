@@ -9,7 +9,7 @@ import { revalidatePath } from 'next/cache'
 export async function getIngredients(restaurantId: string) {
   const supabase = await createClient()
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('ingredients')
     .select('*')
     .eq('restaurant_id', restaurantId)
@@ -36,7 +36,7 @@ export async function createIngredient(
   try {
     const supabase = await createClient()
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('ingredients')
       .insert({
         restaurant_id: restaurantId,
@@ -64,7 +64,7 @@ export async function deleteIngredient(ingredientId: string) {
   try {
     const supabase = await createClient()
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('ingredients')
       .delete()
       .eq('id', ingredientId)
@@ -91,7 +91,7 @@ export async function updateIngredient(
   try {
     const supabase = await createClient()
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('ingredients')
       .update({
         name,

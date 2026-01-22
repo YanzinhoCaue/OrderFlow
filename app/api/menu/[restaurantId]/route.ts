@@ -10,7 +10,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ rest
     const supabase = await createClient()
 
     // Get categories first
-    const { data: categories, error: categoriesError } = await supabase
+    const { data: categories, error: categoriesError } = await (supabase as any)
       .from('categories')
       .select('id')
       .eq('restaurant_id', restaurantId)
@@ -27,7 +27,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ rest
     const categoryId = categories[0].id
 
     // Get dishes for preview
-    const { data: items, error: itemsError } = await supabase
+    const { data: items, error: itemsError } = await (supabase as any)
       .from('dishes')
       .select('id, name, description, base_price, image_urls')
       .eq('category_id', categoryId)

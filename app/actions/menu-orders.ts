@@ -35,7 +35,7 @@ export async function submitMenuOrder(data: {
     } else {
       // Try to get the first table from the restaurant (fallback for direct orders)
       console.log('📍 Procurando mesa para restaurante:', data.restaurantId)
-      const { data: tables, error: tablesError } = await supabase
+      const { data: tables, error: tablesError } = await (supabase as any)
         .from('tables')
         .select('id')
         .eq('restaurant_id', data.restaurantId)
@@ -49,7 +49,7 @@ export async function submitMenuOrder(data: {
       } else {
         // Create a temporary table for this order if none exists
         console.log('🆕 Criando mesa temporária...')
-        const { data: newTable, error: tableError } = await supabase
+        const { data: newTable, error: tableError } = await (supabase as any)
           .from('tables')
           .insert({
             restaurant_id: data.restaurantId,
@@ -76,7 +76,7 @@ export async function submitMenuOrder(data: {
       total_amount: data.totalPrice,
     })
 
-    const { data: order, error: orderError } = await supabase
+    const { data: order, error: orderError } = await (supabase as any)
       .from('orders')
       .insert({
         restaurant_id: data.restaurantId,
@@ -103,7 +103,7 @@ export async function submitMenuOrder(data: {
         unit_price: item.finalPrice,
       })
 
-      const { data: orderItem, error: itemError } = await supabase
+      const { data: orderItem, error: itemError } = await (supabase as any)
         .from('order_items')
         .insert({
           order_id: order.id,
@@ -157,7 +157,7 @@ export async function submitMenuOrder(data: {
       // Save all ingredient customizations
       if (ingredientInserts.length > 0) {
         console.log('🥘 Inserindo ingredientes customizados:', ingredientInserts)
-        const { error: ingError } = await supabase
+        const { error: ingError } = await (supabase as any)
           .from('order_item_ingredients')
           .insert(ingredientInserts)
 
@@ -169,7 +169,7 @@ export async function submitMenuOrder(data: {
 
     // Create status history
     console.log('📜 Criando histórico de status...')
-    await supabase.from('order_status_history').insert({
+    await (supabase as any).from('order_status_history').insert({
       order_id: order.id,
       status: 'pending',
     })
@@ -177,7 +177,7 @@ export async function submitMenuOrder(data: {
     // 🔔 CRIAR NOTIFICAÇÃO PARA A COZINHA
     console.log('🔔 Criando notificação para cozinha...')
     const kitchenNotifMsg = `Novo pedido #${order.order_number} recebido!`
-    const { data: notifData, error: notifError } = await supabase
+    const { data: notifData, error: notifError } = await (supabase as any)
       .from('notifications')
       .insert({
         restaurant_id: data.restaurantId,

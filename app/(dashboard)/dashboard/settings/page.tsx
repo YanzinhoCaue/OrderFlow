@@ -75,6 +75,7 @@ export default async function SettingsPage() {
       serviceFee: t('dashboardSettings.serviceFee'),
       pixKey: t('dashboardSettings.pixKey'),
       save: t('dashboardSettings.save'),
+      saving: t('dashboardSettings.saving'),
       saveChanges: t('dashboardSettings.saveChanges'),
       success: t('dashboardSettings.success'),
       error: t('dashboardSettings.error'),

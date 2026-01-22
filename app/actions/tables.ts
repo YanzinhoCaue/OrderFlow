@@ -10,7 +10,7 @@ import QRCode from 'qrcode'
 export async function getTables(restaurantId: string) {
   const supabase = await createClient()
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('tables')
     .select('*')
     .eq('restaurant_id', restaurantId)
@@ -39,7 +39,7 @@ export async function createTable(data: {
     const supabase = await createClient()
 
     // Create table
-    const { data: table, error: tableError } = await supabase
+    const { data: table, error: tableError } = await (supabase as any)
       .from('tables')
       .insert({
         restaurant_id: data.restaurantId,
@@ -75,7 +75,7 @@ export async function generateTableQRCode(tableId: string) {
     const newToken = crypto.randomUUID()
 
     // Get table and restaurant info
-    const { data: table, error: tableError } = await supabase
+    const { data: table, error: tableError } = await (supabase as any)
       .from('tables')
       .select('*, restaurants(slug)')
       .eq('id', tableId)
@@ -121,7 +121,7 @@ export async function generateTableQRCode(tableId: string) {
       .getPublicUrl(uploadData.path)
 
     // Update table with new QR code URL and new token
-    const { error: updateError } = await supabase
+    const { error: updateError } = await (supabase as any)
       .from('tables')
       .update({ 
         qr_code_url: publicUrl,
@@ -153,7 +153,7 @@ export async function updateTable(data: {
   try {
     const supabase = await createClient()
 
-    const { data: table, error } = await supabase
+    const { data: table, error } = await (supabase as any)
       .from('tables')
       .update({
         table_number: data.tableNumber,
@@ -183,7 +183,7 @@ export async function deleteTable(tableId: string) {
   try {
     const supabase = await createClient()
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('tables')
       .delete()
       .eq('id', tableId)

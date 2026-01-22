@@ -59,6 +59,10 @@ export interface Database {
           theme_color: string
           is_active: boolean
           onboarding_completed: boolean
+          business_hours: Json | null
+          social_media: Json | null
+          payment_settings: Json | null
+          pix_key: string | null
           created_at: string
           updated_at: string
         }
@@ -74,6 +78,10 @@ export interface Database {
           theme_color?: string
           is_active?: boolean
           onboarding_completed?: boolean
+          business_hours?: Json | null
+          social_media?: Json | null
+          payment_settings?: Json | null
+          pix_key?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -89,6 +97,10 @@ export interface Database {
           theme_color?: string
           is_active?: boolean
           onboarding_completed?: boolean
+          business_hours?: Json | null
+          social_media?: Json | null
+          payment_settings?: Json | null
+          pix_key?: string | null
           created_at?: string
           updated_at?: string
         }

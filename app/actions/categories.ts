@@ -13,7 +13,7 @@ export async function getRestaurantByOwner() {
 
   if (!user) return null
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('restaurants')
     .select('*')
     .eq('owner_id', user.id)
@@ -33,7 +33,7 @@ export async function getRestaurantByOwner() {
 export async function getCategories(restaurantId: string) {
   const supabase = await createClient()
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('categories')
     .select('*')
     .eq('restaurant_id', restaurantId)
@@ -58,7 +58,7 @@ export async function createCategory(
   try {
     const supabase = await createClient()
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('categories')
       .insert({
         restaurant_id: restaurantId,
@@ -89,7 +89,7 @@ export async function updateCategory(
   try {
     const supabase = await createClient()
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('categories')
       .update({ name, description })
       .eq('id', categoryId)
@@ -113,7 +113,7 @@ export async function deleteCategory(categoryId: string) {
   try {
     const supabase = await createClient()
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('categories')
       .delete()
       .eq('id', categoryId)

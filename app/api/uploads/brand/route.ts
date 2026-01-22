@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'ID do restaurante inválido' }, { status: 400 })
     }
 
-    const { data: restaurant, error: restaurantError } = await supabase
+    const { data: restaurant, error: restaurantError } = await (supabase as any)
       .from('restaurants')
       .select('id, owner_id')
       .eq('id', restaurantId)

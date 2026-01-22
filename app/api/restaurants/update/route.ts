@@ -18,7 +18,7 @@ export async function PATCH(request: Request) {
     const cleanDocument = body.cpfCnpj?.replace(/\D/g, '') || null
 
     // Update restaurant
-    const { data: restaurant, error: restaurantError } = await supabase
+    const { data: restaurant, error: restaurantError } = await (supabase as any)
       .from('restaurants')
       .update({
         name: body.restaurantName,
@@ -40,7 +40,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: restaurantError.message }, { status: 400 })
     }
 
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await (supabase as any)
       .from('profiles')
       .update({
         full_name: body.ownerName,
