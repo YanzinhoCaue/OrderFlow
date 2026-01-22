@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import { getDictionary, translate } from '@/lib/i18n/server'
 import PreviewClient from '@/components/dashboard/PreviewClient'
+import { Database } from '@/lib/supabase/types'
 
 export default async function PreviewPage() {
   const cookieStore = await cookies()
@@ -31,7 +32,10 @@ export default async function PreviewPage() {
     .eq('owner_id', user.id)
     .single()
 
-  if (!restaurant) {
+  type RestaurantRow = Database['public']['Tables']['restaurants']['Row']
+  const restaurantData = restaurant as RestaurantRow | null
+
+  if (!restaurantData) {
     return <div>{t('common.error')}</div>
   }
 
@@ -45,11 +49,11 @@ export default async function PreviewPage() {
   }
 
   const normalizedRestaurant = {
-    ...(restaurant as Record<string, any>),
-    name: normalizeField(restaurant.name),
-    description: normalizeField(restaurant.description),
+    ...(restaurantData as Record<string, any>),
+    name: normalizeField(restaurantData.name),
+    description: normalizeField(restaurantData.description),
     cpf_cnpj: profile?.cpf_cnpj || null,
-    restaurant_phone: restaurant.phone || profile?.phone || null,
+    restaurant_phone: restaurantData.phone || profile?.phone || null,
   }
 
   // Fetch categories
