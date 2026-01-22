@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import MenuPageClient from '@/components/menu/MenuPageClient'
+import { Database } from '@/lib/supabase/types'
 
 const normalizeField = (field: any) => {
   if (!field) return ''
@@ -53,12 +54,15 @@ export default async function PublicMenuPage({ params }: Props) {
     )
   }
 
+  type RestaurantRow = Database['public']['Tables']['restaurants']['Row']
+  const restaurantData = restaurant as RestaurantRow
+
   // Get table by token
   const { data: table, error: tableError } = await supabase
     .from('tables')
     .select('*')
     .eq('qr_code_token', tableToken)
-    .eq('restaurant_id', (restaurant as any).id)
+    .eq('restaurant_id', restaurantData.id)
     .eq('is_active', true)
     .single()
 
@@ -91,16 +95,16 @@ export default async function PublicMenuPage({ params }: Props) {
         )
       )
     `)
-    .eq('restaurant_id', (restaurant as any).id)
+    .eq('restaurant_id', restaurantData.id)
     .eq('is_active', true)
     .order('display_order', { ascending: true })
 
   // Normalize restaurant data
   const normalizedRestaurant = {
-    ...(restaurant as Record<string, any>),
-    name: normalizeField(restaurant.name),
-    description: normalizeField(restaurant.description),
-    restaurant_phone: restaurant.phone || null,
+    ...(restaurantData as Record<string, any>),
+    name: normalizeField(restaurantData.name),
+    description: normalizeField(restaurantData.description),
+    restaurant_phone: restaurantData.phone || null,
   }
 
   // Normalize categories

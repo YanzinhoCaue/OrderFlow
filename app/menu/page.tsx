@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import MenuPageClient from '@/components/menu/MenuPageClient'
+import { Database } from '@/lib/supabase/types'
 
 const normalizeField = (field: any) => {
   if (!field) return ''
@@ -40,17 +41,20 @@ export default async function MenuPage() {
     )
   }
 
+  type RestaurantRow = Database['public']['Tables']['restaurants']['Row']
+  const restaurantData = restaurant as RestaurantRow
+
   const normalizedRestaurant = {
-    ...(restaurant as Record<string, any>),
-    name: normalizeField(restaurant.name),
-    description: normalizeField(restaurant.description),
-    restaurant_phone: restaurant.phone || null,
+    ...(restaurantData as Record<string, any>),
+    name: normalizeField(restaurantData.name),
+    description: normalizeField(restaurantData.description),
+    restaurant_phone: restaurantData.phone || null,
   }
 
   const { data: categories } = await supabase
     .from('categories')
     .select('*')
-    .eq('restaurant_id', restaurant.id)
+    .eq('restaurant_id', restaurantData.id)
 
   const normalizedCategories = (categories || []).map((cat) => ({
     ...cat,
@@ -62,7 +66,7 @@ export default async function MenuPage() {
     const { data: dishes } = await supabase
       .from('dishes')
       .select('*, dish_images(*), dish_ingredients(*, ingredients(*))')
-      .eq('restaurant_id', restaurant.id)
+      .eq('restaurant_id', restaurantData.id)
       .eq('is_available', true)
 
     allDishes = (dishes || []).map((dish) => {
