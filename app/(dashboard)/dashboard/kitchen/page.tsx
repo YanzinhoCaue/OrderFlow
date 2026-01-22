@@ -82,19 +82,20 @@ export default function KitchenPage() {
         schema: 'public',
         table: 'notifications',
         filter: `target=eq.kitchen`,
-      }, (payload: any) => {
-        console.log('🔔 [COZINHA] Notificação recebida via Realtime:', payload)
-        console.log('   - Event Type:', payload.eventType)
-        console.log('   - Target:', payload.new?.target)
-        console.log('   - Type:', payload.new?.type)
-        console.log('   - Message:', payload.new?.message)
+      }, (payload) => {
+        const data = payload as any
+        console.log('🔔 [COZINHA] Notificação recebida via Realtime:', data)
+        console.log('   - Event Type:', data.eventType)
+        console.log('   - Target:', data.new?.target)
+        console.log('   - Type:', data.new?.type)
+        console.log('   - Message:', data.new?.message)
         
-        if (payload.eventType === 'INSERT') {
+        if (data.eventType === 'INSERT') {
           const newNotification = {
-            id: payload.new.id,
+            id: data.new.id,
             title: 'Nova Notificação',
-            message: payload.new.message,
-            type: payload.new.type,
+            message: data.new.message,
+            type: data.new.type,
             timestamp: new Date(),
           }
           setNotifications(prev => {
