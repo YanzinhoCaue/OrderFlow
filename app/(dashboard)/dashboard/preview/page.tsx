@@ -63,7 +63,7 @@ export default async function PreviewPage() {
   const { data: categories } = await supabase
     .from('categories')
     .select('*')
-    .eq('restaurant_id', restaurant.id)
+    .eq('restaurant_id', restaurantData.id)
 
   // Normalize categories
   const normalizedCategories = (categories || []).map((cat) => ({
@@ -77,7 +77,7 @@ export default async function PreviewPage() {
     const { data: dishes } = await supabase
       .from('dishes')
       .select('*')
-      .eq('restaurant_id', restaurant.id)
+      .eq('restaurant_id', restaurantData.id)
       .eq('is_available', true)
 
     allDishes = (dishes || []).map((dish) => ({
