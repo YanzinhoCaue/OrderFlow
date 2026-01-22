@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { getDictionary, translate } from '@/lib/i18n/server'
 import PreviewClient from '@/components/dashboard/PreviewClient'
 import { Database } from '@/lib/supabase/types'
+import { Database } from '@/lib/supabase/types'
 
 export default async function PreviewPage() {
   const cookieStore = await cookies()
@@ -25,6 +26,9 @@ export default async function PreviewPage() {
     .select('cpf_cnpj, phone')
     .eq('id', user.id)
     .single()
+
+  type ProfileRow = Database['public']['Tables']['profiles']['Row']
+  const profileData = profile as ProfileRow | null
 
   const { data: restaurant } = await supabase
     .from('restaurants')
@@ -52,8 +56,8 @@ export default async function PreviewPage() {
     ...(restaurantData as Record<string, any>),
     name: normalizeField(restaurantData.name),
     description: normalizeField(restaurantData.description),
-    cpf_cnpj: profile?.cpf_cnpj || null,
-    restaurant_phone: restaurantData.phone || profile?.phone || null,
+    cpf_cnpj: profileData?.cpf_cnpj ?? null,
+    restaurant_phone: restaurantData.phone || profileData?.phone || null,
   }
 
   // Fetch categories
