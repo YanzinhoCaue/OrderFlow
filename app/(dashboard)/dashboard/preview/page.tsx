@@ -3,7 +3,6 @@ import { cookies } from 'next/headers'
 import { getDictionary, translate } from '@/lib/i18n/server'
 import PreviewClient from '@/components/dashboard/PreviewClient'
 import { Database } from '@/lib/supabase/types'
-import { Database } from '@/lib/supabase/types'
 
 export default async function PreviewPage() {
   const cookieStore = await cookies()
