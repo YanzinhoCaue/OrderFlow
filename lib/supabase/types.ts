@@ -445,6 +445,38 @@ export interface Database {
           created_at?: string
         }
       }
+      notifications: {
+        Row: {
+          id: string
+          restaurant_id: string | null
+          order_id: string | null
+          type: string
+          message: string
+          read: boolean
+          target: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          restaurant_id?: string | null
+          order_id?: string | null
+          type: string
+          message: string
+          read?: boolean
+          target?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          restaurant_id?: string | null
+          order_id?: string | null
+          type?: string
+          message?: string
+          read?: boolean
+          target?: string | null
+          created_at?: string
+        }
+      }
     }
   }
 }

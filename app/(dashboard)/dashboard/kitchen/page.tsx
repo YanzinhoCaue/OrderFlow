@@ -281,7 +281,7 @@ export default function KitchenPage() {
       // Marca como lida e remove apenas da lista local (não toca em pedidos)
       const { error } = await supabase
         .from('notifications')
-        .update({ read: true } as any)
+        .update({ read: true })
         .eq('id', notificationId)
         .eq('target', 'kitchen')
 
@@ -300,7 +300,7 @@ export default function KitchenPage() {
 
       const { error } = await supabase
         .from('notifications')
-        .update({ read: true } as any)
+        .update({ read: true })
         .in('id', notificationIds)
         .eq('target', 'kitchen')
 
