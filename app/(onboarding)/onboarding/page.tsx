@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import OnboardingWizard from '@/components/onboarding/OnboardingWizard'
 
+export const dynamic = 'force-dynamic'
+
 export default async function OnboardingPage() {
   try {
     const supabase = await createClient()
