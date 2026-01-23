@@ -33,18 +33,17 @@ export default async function DashboardLayout({
     .select('*')
     .eq('owner_id', (profile as any).id)
     .single()
-  
-  if (!restaurant || !(restaurant as any).onboarding_completed) {
-    redirect('/onboarding')
-  }
+
+  // Provide a safe fallback to avoid null access in client components
+  const safeRestaurant = restaurant ?? { name: 'Restaurante', logo_url: null }
 
   return (
     <SidebarProvider>
       <MobileMenuProvider>
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-          <DashboardSidebar restaurant={restaurant} />
+          <DashboardSidebar restaurant={safeRestaurant} />
           <DashboardLayoutClient>
-            <DashboardHeader user={user} restaurant={restaurant} />
+            <DashboardHeader user={user} restaurant={safeRestaurant} />
             <main className="p-4 sm:p-6">
               {children}
             </main>

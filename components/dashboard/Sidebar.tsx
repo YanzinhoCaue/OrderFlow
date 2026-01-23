@@ -106,15 +106,15 @@ export default function DashboardSidebar({ restaurant }: SidebarProps) {
           <div className="flex items-center justify-between px-4 pt-5 pb-3">
             {!isCollapsed && (
               <div className="flex items-center gap-3">
-                {restaurant.logo_url && (
+                {restaurant?.logo_url && (
                   <img 
-                    src={restaurant.logo_url} 
-                    alt={restaurant.name}
+                    src={restaurant?.logo_url} 
+                    alt={restaurant?.name ?? 'Restaurante'}
                     className="w-10 h-10 rounded-lg object-cover ring-2 ring-amber-500/20"
                   />
                 )}
                 <h1 className="text-lg font-bold bg-gradient-to-r from-[#b45309] via-[#d97706] to-[#f59e0b] dark:from-amber-200 dark:via-amber-400 dark:to-orange-500 bg-clip-text text-transparent truncate">
-                  {restaurant.name}
+                  {restaurant?.name ?? 'Restaurante'}
                 </h1>
               </div>
             )}
