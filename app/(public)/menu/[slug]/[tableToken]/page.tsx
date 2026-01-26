@@ -23,13 +23,7 @@ export default async function PublicMenuPage({ params }: Props) {
   const { slug, tableToken } = await params
   const supabase = await createClient()
 
-  // Check if user is authenticated
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  // If not authenticated, redirect to login with return URL
-  if (!user) {
-    redirect(`/login?redirect=/menu/${slug}/${tableToken}`)
-  }
+  // Public menu - no authentication required for customers scanning QR codes
 
   // Get restaurant by slug
   const { data: restaurant, error: restaurantError } = await supabase
