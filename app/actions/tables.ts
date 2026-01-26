@@ -84,8 +84,8 @@ export async function generateTableQRCode(tableId: string) {
     if (tableError) throw tableError
     if (!table) throw new Error('Table not found')
 
-    // For now, use localhost for QR code URL
-    const baseUrl = 'http://localhost:3000'
+    // Get base URL from environment or use production domain
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://imenuflow.krin.tech'
 
     // Generate QR code URL - points to the menu with table token (new token)
     const menuUrl = `${baseUrl}/menu/${(table.restaurants as any).slug}/${newToken}`
