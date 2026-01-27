@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { FiStar, FiSearch, FiClock, FiTrendingUp, FiTrendingDown, FiBarChart2 } from 'react-icons/fi'
 
+// Cache bust for Vercel deployment
 interface ReviewsClientProps {
   restaurantId: string
   metrics: {
