@@ -66,6 +66,7 @@ export default function MenuPageClient({ user, table, restaurant, categories, di
   const [showReviewModal, setShowReviewModal] = useState(false)
   const [reviewPendingOrderId, setReviewPendingOrderId] = useState<string | null>(null)
   const [reviewScores, setReviewScores] = useState({ dish: 0, waiter: 0, restaurant: 0 })
+  const [reviewComments, setReviewComments] = useState({ dish: '', waiter: '', restaurant: '' })
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const [lastOrderDishIds, setLastOrderDishIds] = useState<string[]>([])
   const [lastOrderDishNames, setLastOrderDishNames] = useState<string[]>([])
@@ -234,6 +235,7 @@ export default function MenuPageClient({ user, table, restaurant, categories, di
   const openReviewModal = (orderId: string) => {
     setReviewPendingOrderId(orderId)
     setReviewScores({ dish: 0, waiter: 0, restaurant: 0 })
+    setReviewComments({ dish: '', waiter: '', restaurant: '' })
     setShowReviewModal(true)
   }
 
@@ -433,6 +435,7 @@ export default function MenuPageClient({ user, table, restaurant, categories, di
           target_id: restaurant.id,
           order_id: reviewPendingOrderId,
           rating: reviewScores.restaurant,
+          comment: reviewComments.restaurant?.trim() || null,
         },
         {
           restaurant_id: restaurant.id,
@@ -440,6 +443,7 @@ export default function MenuPageClient({ user, table, restaurant, categories, di
           target_id: null,
           order_id: reviewPendingOrderId,
           rating: reviewScores.waiter,
+          comment: reviewComments.waiter?.trim() || null,
         },
         {
           restaurant_id: restaurant.id,
@@ -447,6 +451,7 @@ export default function MenuPageClient({ user, table, restaurant, categories, di
           target_id: lastOrderDishIds[0] || null,
           order_id: reviewPendingOrderId,
           rating: reviewScores.dish,
+          comment: reviewComments.dish?.trim() || null,
         },
       ]
 
@@ -456,6 +461,8 @@ export default function MenuPageClient({ user, table, restaurant, categories, di
       markOrderAsRated(reviewPendingOrderId)
       setShowReviewModal(false)
       setReviewPendingOrderId(null)
+      setReviewScores({ dish: 0, waiter: 0, restaurant: 0 })
+      setReviewComments({ dish: '', waiter: '', restaurant: '' })
     } catch (err) {
       console.error('Erro ao enviar avaliação:', err)
       alert(t('publicMenu.errors.submitReview'))
@@ -1137,6 +1144,14 @@ export default function MenuPageClient({ user, table, restaurant, categories, di
                   Avalie o prato {lastOrderDishNames[0] ? `(${lastOrderDishNames[0]})` : ''}
                 </p>
                 {renderStars('dish')}
+                <textarea
+                  value={reviewComments.dish}
+                  onChange={(e) => setReviewComments((prev) => ({ ...prev, dish: e.target.value }))}
+                  placeholder="Conte como foi o prato"
+                  className={`w-full rounded-lg border px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-500/50 ${theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white placeholder:text-gray-500' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-500'}`}
+                  rows={2}
+                  maxLength={500}
+                />
               </div>
 
               <div className="space-y-2">
@@ -1144,6 +1159,14 @@ export default function MenuPageClient({ user, table, restaurant, categories, di
                   Avalie o atendimento do garçom
                 </p>
                 {renderStars('waiter')}
+                <textarea
+                  value={reviewComments.waiter}
+                  onChange={(e) => setReviewComments((prev) => ({ ...prev, waiter: e.target.value }))}
+                  placeholder="Como foi o atendimento?"
+                  className={`w-full rounded-lg border px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-500/50 ${theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white placeholder:text-gray-500' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-500'}`}
+                  rows={2}
+                  maxLength={500}
+                />
               </div>
 
               <div className="space-y-2">
@@ -1151,6 +1174,14 @@ export default function MenuPageClient({ user, table, restaurant, categories, di
                   Avalie o restaurante
                 </p>
                 {renderStars('restaurant')}
+                <textarea
+                  value={reviewComments.restaurant}
+                  onChange={(e) => setReviewComments((prev) => ({ ...prev, restaurant: e.target.value }))}
+                  placeholder="Compartilhe sua experiência geral"
+                  className={`w-full rounded-lg border px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-500/50 ${theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white placeholder:text-gray-500' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-500'}`}
+                  rows={2}
+                  maxLength={500}
+                />
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-2">
@@ -1161,6 +1192,8 @@ export default function MenuPageClient({ user, table, restaurant, categories, di
                       markOrderAsRated(reviewPendingOrderId)
                       setReviewPendingOrderId(null)
                     }
+                    setReviewScores({ dish: 0, waiter: 0, restaurant: 0 })
+                    setReviewComments({ dish: '', waiter: '', restaurant: '' })
                   }}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold ${theme === 'dark' ? 'text-gray-200 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100'}`}
                 >
