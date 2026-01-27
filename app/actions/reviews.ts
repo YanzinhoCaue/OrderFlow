@@ -48,7 +48,8 @@ export async function getDishReviews(restaurantId: string) {
           .eq('id', review.target_id)
           .single()
         if (dish) {
-          dishName = typeof dish.name === 'string' ? dish.name : dish.name?.['pt-BR'] || dish.name?.['en-US'] || 'Prato'
+          const dishData = dish as any
+          dishName = typeof dishData.name === 'string' ? dishData.name : dishData.name?.['pt-BR'] || dishData.name?.['en-US'] || 'Prato'
         }
       }
       return { ...review, dishName }
@@ -92,8 +93,9 @@ export async function getDishMetrics(restaurantId: string) {
   const dishNameMap: Record<string, string> = {}
   if (dishes) {
     for (const dish of dishes) {
-      const name = typeof dish.name === 'string' ? dish.name : dish.name?.['pt-BR'] || dish.name?.['en-US'] || 'Prato'
-      dishNameMap[dish.id] = name
+      const dishData = dish as any
+      const name = typeof dishData.name === 'string' ? dishData.name : dishData.name?.['pt-BR'] || dishData.name?.['en-US'] || 'Prato'
+      dishNameMap[(dish as any).id] = name
     }
   }
 
