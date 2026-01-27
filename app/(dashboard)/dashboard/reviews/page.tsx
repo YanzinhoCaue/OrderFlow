@@ -1,5 +1,5 @@
 import { getRestaurantByOwner } from '@/app/actions/categories'
-import { getReviewMetrics, getRecentReviews } from '@/app/actions/reviews'
+import { getReviewMetrics, getRecentReviews, getDishMetrics, getRatingDistribution } from '@/app/actions/reviews'
 import { cookies } from 'next/headers'
 import { getDictionary, translate } from '@/lib/i18n/server'
 import ReviewsClient from './ReviewsClient'
@@ -16,16 +16,30 @@ export default async function ReviewsPage() {
     return <div>{t('common.error')}</div>
   }
 
-  const [metrics, recent] = await Promise.all([
-    getReviewMetrics((restaurant as any).id),
-    getRecentReviews((restaurant as any).id),
+  const restaurantId = (restaurant as any).id
+
+  const [metrics, recent, dishMetrics, ratingDist] = await Promise.all([
+    getReviewMetrics(restaurantId),
+    getRecentReviews(restaurantId, 50),
+    getDishMetrics(restaurantId),
+    Promise.all([
+      getRatingDistribution(restaurantId, 'restaurant'),
+      getRatingDistribution(restaurantId, 'waiter'),
+      getRatingDistribution(restaurantId, 'dish'),
+    ]).then(([rest, wait, dish]) => ({
+      restaurant: rest,
+      waiter: wait,
+      dish: dish,
+    })),
   ])
 
   return (
     <ReviewsClient
-      restaurantId={(restaurant as any).id}
+      restaurantId={restaurantId}
       metrics={metrics as any}
       reviews={recent as any[]}
+      dishMetrics={dishMetrics as any}
+      ratingDistributions={ratingDist as any}
       labels={{
         title: t('dashboardReviews.title'),
         heading: t('dashboardReviews.heading'),
@@ -39,6 +53,10 @@ export default async function ReviewsPage() {
         comment: t('dashboardReviews.comment'),
         all: t('dashboardReviews.all'),
         searchPlaceholder: t('dashboardReviews.searchPlaceholder'),
+        topDishes: 'Pratos Mais Bem Avaliados',
+        needsImprovement: 'Pratos que Precisam Melhorar',
+        ratingDistribution: 'Distribuição de Notas',
+        statistics: 'Estatísticas',
       }}
     />
   )
