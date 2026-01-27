@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from 'react'
-import { FiStar, FiSearch, FiClock, FiTrendingUp, FiTrendingDown, FiBarChart3 } from 'react-icons/fi'
+import { FiStar, FiSearch, FiClock, FiTrendingUp, FiTrendingDown, FiBarChart2 } from 'react-icons/fi'
 
 interface ReviewsClientProps {
   restaurantId: string
@@ -331,7 +331,7 @@ export default function ReviewsClient({
           ].map(({ key, label }) => (
             <div key={key} className="bg-white/80 dark:bg-white/5 border-2 border-amber-500/20 rounded-2xl shadow-xl backdrop-blur-xl p-6">
               <div className="flex items-center gap-2 mb-4">
-                <FiBarChart3 className="text-amber-600 dark:text-amber-400" size={20} />
+                <FiBarChart2 className="text-amber-600 dark:text-amber-400" size={20} />
                 <h2 className="text-lg font-bold text-stone-900 dark:text-white">{label}</h2>
               </div>
               {renderDistribution(ratingDistributions[key as 'restaurant' | 'waiter' | 'dish'])}
