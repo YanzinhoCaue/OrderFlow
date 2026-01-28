@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import DashboardShell from '@/components/dashboard/DashboardShell'
+import DashboardFallback from '@/components/dashboard/DashboardFallback'
 
 interface DaySeries {
   day: number
@@ -55,7 +56,7 @@ export default async function DashboardPage({
   } = await supabase.auth.getUser()
   console.info('[DASHBOARD] USER:', user);
   if (!user) {
-    return null
+    return <DashboardFallback message="Usuário não autenticado." />;
   }
   const { data: profile } = await supabase
     .from('profiles')
@@ -64,7 +65,7 @@ export default async function DashboardPage({
     .single()
   console.info('[DASHBOARD] PROFILE:', profile);
   if (!profile) {
-    return null
+    return <DashboardFallback message="Perfil não encontrado." />;
   }
 
   const { data: restaurant } = await supabase
@@ -74,7 +75,7 @@ export default async function DashboardPage({
     .single()
 
   if (!restaurant) {
-    return null
+    return <DashboardFallback message="Restaurante não encontrado." />;
   }
 
   const restaurantCreatedAt = (restaurant as any).created_at ? new Date((restaurant as any).created_at) : new Date()
