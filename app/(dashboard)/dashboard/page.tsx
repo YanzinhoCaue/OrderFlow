@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import DashboardShell from '@/components/dashboard/DashboardShell'
 import DashboardFallback from '@/components/dashboard/DashboardFallback'
+import { redirect } from 'next/navigation'
 
 interface DaySeries {
   day: number
@@ -65,7 +66,8 @@ export default async function DashboardPage({
     .single()
   console.info('[DASHBOARD] PROFILE:', profile);
   if (!profile) {
-    return <DashboardFallback message="Perfil não encontrado." />;
+    // Se não tem perfil, redireciona para onboarding
+    redirect('/onboarding');
   }
 
   const { data: restaurant } = await supabase
@@ -75,7 +77,8 @@ export default async function DashboardPage({
     .single()
 
   if (!restaurant) {
-    return <DashboardFallback message="Restaurante não encontrado." />;
+    // Se não tem restaurante, redireciona para onboarding
+    redirect('/onboarding');
   }
 
   const restaurantCreatedAt = (restaurant as any).created_at ? new Date((restaurant as any).created_at) : new Date()
