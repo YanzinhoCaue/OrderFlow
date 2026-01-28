@@ -36,9 +36,14 @@ export async function updateSession(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser()
 
+    // LOGS DETALHADOS DE DIAGNÓSTICO
+    console.log('--- MIDDLEWARE DIAGNÓSTICO ---')
+    console.log('URL:', request.nextUrl.pathname)
+    console.log('HEADERS:', Object.fromEntries(request.headers.entries()))
+    console.log('COOKIES:', request.cookies.getAll())
+
     // LOG DE DIAGNÓSTICO
     console.log('SUPABASE USER:', user)
-    console.log('COOKIES:', request.cookies.getAll())
 
     // Protected routes
     const protectedPaths = ['/dashboard', '/onboarding']
