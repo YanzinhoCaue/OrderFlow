@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
 import DashboardShell from '@/components/dashboard/DashboardShell'
 
 interface DaySeries {
@@ -43,23 +44,25 @@ export default async function DashboardPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
+  // LOGGING: Diagnóstico de autenticação/redirect
+  const allCookies = cookies().getAll();
+  console.info('[DASHBOARD] INÍCIO');
+  console.info('[DASHBOARD] COOKIES:', allCookies);
   const params = await searchParams
   const supabase = await createClient()
-
   const {
     data: { user },
   } = await supabase.auth.getUser()
-
+  console.info('[DASHBOARD] USER:', user);
   if (!user) {
     return null
   }
-
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single()
-
+  console.info('[DASHBOARD] PROFILE:', profile);
   if (!profile) {
     return null
   }
