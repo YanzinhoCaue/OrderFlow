@@ -36,6 +36,10 @@ export async function updateSession(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser()
 
+    // LOG DE DIAGNÓSTICO
+    console.log('SUPABASE USER:', user)
+    console.log('COOKIES:', request.cookies.getAll())
+
     // Protected routes
     const protectedPaths = ['/dashboard', '/onboarding']
     const isProtectedPath = protectedPaths.some(path => 
