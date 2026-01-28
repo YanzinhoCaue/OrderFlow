@@ -2,6 +2,9 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import OnboardingWizard from '@/components/onboarding/OnboardingWizard'
 import { cookies } from 'next/headers'
+import function OnboardingFallback({ message }: { message: string }) {
+  return <div style={{ padding: 32, textAlign: 'center', color: '#ef4444' }}>{message}</div>;
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -15,7 +18,7 @@ export default async function OnboardingPage() {
     const { data: { user } } = await supabase.auth.getUser()
     console.info('[ONBOARDING] USER:', user);
     if (!user) {
-      redirect('/login')
+      return <OnboardingFallback message="Usuário não autenticado." />;
     }
 
     // If user is authenticated, allow onboarding even if profile doesn't exist yet
@@ -28,16 +31,16 @@ export default async function OnboardingPage() {
         .single()
       console.info('[ONBOARDING] RESTAURANT:', restaurant);
       if (restaurant && (restaurant as any).onboarding_completed) {
-        redirect('/dashboard')
+        return <OnboardingFallback message="Onboarding já concluído. Redirecionando..." />;
       }
     } catch (restaurantError) {
-      console.error('Error fetching restaurant:', restaurantError)
+      console.error('Error fetching restaurant:', restaurantError);
       // Continue with onboarding if restaurant fetch fails
     }
 
-    return <OnboardingWizard />
+    return <OnboardingWizard />;
   } catch (error) {
-    console.error('Error in OnboardingPage:', error)
-    redirect('/login')
+    console.error('Error in OnboardingPage:', error);
+    return <OnboardingFallback message="Erro ao carregar onboarding." />;
   }
 }
