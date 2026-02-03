@@ -48,16 +48,29 @@ export async function updateSession(request: NextRequest) {
     // LOG DE DIAGNÓSTICO
     console.log('SUPABASE USER:', user)
 
+    // Public routes that don't require auth
+    const publicPaths = ['/login', '/callback', '/']
+    const isPublicPath = publicPaths.some(path => 
+      request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path + '/')
+    )
+
     // Protected routes
     const protectedPaths = ['/dashboard', '/onboarding']
     const isProtectedPath = protectedPaths.some(path => 
       request.nextUrl.pathname.startsWith(path)
     )
 
+    // If trying to access protected route without auth, redirect to login
     if (isProtectedPath && !user) {
-      // Redirect to login if trying to access protected route without auth
       const url = request.nextUrl.clone()
       url.pathname = '/login'
+      return NextResponse.redirect(url)
+    }
+
+    // If user is logged in and trying to access login page, redirect to dashboard
+    if (user && isPublicPath && request.nextUrl.pathname === '/login') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard'
       return NextResponse.redirect(url)
     }
 

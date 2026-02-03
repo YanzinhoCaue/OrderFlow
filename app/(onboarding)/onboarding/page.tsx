@@ -2,7 +2,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import OnboardingWizard from '@/components/onboarding/OnboardingWizard'
 import { cookies } from 'next/headers'
-import function OnboardingFallback({ message }: { message: string }) {
+
+function OnboardingFallback({ message }: { message: string }) {
   return <div style={{ padding: 32, textAlign: 'center', color: '#ef4444' }}>{message}</div>;
 }
 
@@ -10,7 +11,8 @@ export const dynamic = 'force-dynamic'
 
 export default async function OnboardingPage() {
   // LOGGING: Diagnóstico de autenticação/redirect
-  const allCookies = cookies().getAll();
+  const cookieStore = await cookies()
+  const allCookies = cookieStore.getAll();
   console.info('[ONBOARDING] INÍCIO');
   console.info('[ONBOARDING] COOKIES:', allCookies);
   try {

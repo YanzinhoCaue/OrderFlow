@@ -47,7 +47,8 @@ export default async function DashboardPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   // LOGGING: Diagnóstico de autenticação/redirect
-  const allCookies = cookies().getAll();
+  const cookieStore = await cookies()
+  const allCookies = cookieStore.getAll();
   console.info('[DASHBOARD] INÍCIO');
   console.info('[DASHBOARD] COOKIES:', allCookies);
   const params = await searchParams
@@ -57,7 +58,7 @@ export default async function DashboardPage({
   } = await supabase.auth.getUser()
   console.info('[DASHBOARD] USER:', user);
   if (!user) {
-    return <DashboardFallback message="Usuário não autenticado." />;
+    return <DashboardFallback />;
   }
   const { data: profile } = await supabase
     .from('profiles')
