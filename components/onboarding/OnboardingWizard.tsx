@@ -170,183 +170,240 @@ export default function OnboardingWizard() {
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#f8ecdd] via-[#f2d7b5] to-[#e5c39a] dark:from-[#0b1021] dark:via-[#12182a] dark:to-[#0f172a] flex items-center justify-center p-4">
       {/* Animated Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 animate-pulse" style={{
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c46c1c' fill-opacity='0.18'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }} />
       </div>
 
       {/* Floating Orbs with movement */}
-      <div className="absolute top-10 left-10 w-64 h-64 bg-amber-600/20 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-10 right-10 w-80 h-80 bg-orange-700/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1.5s' }} />
-      <div className="absolute top-1/2 left-1/3 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }} />
+      <div className="absolute top-0 left-0 w-96 h-96 bg-amber-600/20 rounded-full blur-3xl" style={{ animation: 'float 6s ease-in-out infinite' }} />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-orange-700/20 rounded-full blur-3xl" style={{ animation: 'float 8s ease-in-out infinite 1s' }} />
 
       {/* Theme Toggle */}
       <div className="absolute top-6 right-6 z-20">
-        <div className="glass px-3 py-2 rounded-xl">
+        <div className="glass px-4 py-2 rounded-xl hover:bg-white/10 transition-colors">
           <ThemeSwitcher />
         </div>
       </div>
 
-      <div className="relative z-10 w-full max-w-5xl">
-        <div className="rounded-3xl p-8 shadow-2xl border-2 border-amber-500/30 bg-white/85 dark:bg-white/5 backdrop-blur-2xl">
-          {/* Header */}
-          <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-[#b45309] via-[#d97706] to-[#f59e0b] dark:from-amber-200 dark:via-amber-400 dark:to-orange-500 bg-clip-text text-transparent mb-2">
-              Faça seu cadastro
-            </h1>
-            <p className="text-stone-600 dark:text-stone-400 text-sm">
-              Preencha as informações para começar
-            </p>
-          </div>
-
-          {errors.general && (
-            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 rounded-xl text-red-700 dark:text-red-400 text-sm">
-              {errors.general}
-            </div>
-          )}
-
-          {/* User Type Selection */}
-          <div className="mb-6">
-            <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-3">
-              Você é: *
-            </label>
-            <button
-              type="button"
-              onClick={() => updateField('userType', 'owner')}
-              disabled
-              className={`w-full p-4 rounded-xl border-2 transition-all duration-300 border-amber-500 bg-amber-50/50 dark:bg-amber-500/10`}
-            >
-              <div className="flex flex-col items-center gap-3">
-                <div className={`p-4 rounded-full bg-amber-500 text-white`}>
-                  <FiSettings size={22} />
+      {/* Main Container */}
+      <div className="relative z-10 w-full max-w-6xl">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
+          {/* Left Side - Branding */}
+          <div className="lg:col-span-2 hidden lg:block">
+            <div className="space-y-8">
+              {/* Logo Area */}
+              <div className="space-y-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg">
+                  <FiSettings className="text-white" size={32} />
                 </div>
-                <div className="text-center">
-                  <h3 className="font-bold text-stone-800 dark:text-stone-100">Proprietário</h3>
-                  <p className="text-xs text-stone-600 dark:text-stone-400 mt-1">Gerenciar restaurante</p>
-                </div>
-                <FiCheck className="text-amber-500" size={20} strokeWidth={3} />
+                <h2 className="text-4xl font-bold bg-gradient-to-r from-[#b45309] to-[#f59e0b] dark:from-amber-200 dark:to-amber-500 bg-clip-text text-transparent">
+                  iMenuFlow
+                </h2>
+                <p className="text-lg text-stone-600 dark:text-stone-400">
+                  Digitalize seu restaurante
+                </p>
               </div>
-            </button>
+
+              {/* Features List */}
+              <div className="space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-stone-900 dark:text-white">Cardápio Digital</h3>
+                    <p className="text-sm text-stone-600 dark:text-stone-400">Gerencie seus pratos online</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-stone-900 dark:text-white">QR Code Inteligente</h3>
+                    <p className="text-sm text-stone-600 dark:text-stone-400">Acesso rápido às mesas</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-stone-900 dark:text-white">Pedidos em Tempo Real</h3>
+                    <p className="text-sm text-stone-600 dark:text-stone-400">Notificações instantâneas</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Dynamic Form */}
-          <div className="space-y-4">
-            {/* Restaurant Name */}
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
-                <FiFileText className="text-amber-500" />
-                Nome do Restaurante *
-              </label>
-              <input
-                type="text"
-                value={formData.restaurantName}
-                onChange={(e) => updateField('restaurantName', e.target.value)}
-                placeholder="Ex: Restaurante do João"
-                className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
-              />
-              {errors.restaurantName && <p className="text-red-500 text-xs mt-1">{errors.restaurantName}</p>}
-            </div>
+          {/* Right Side - Form */}
+          <div className="lg:col-span-3">
+            <div className="rounded-3xl p-8 shadow-2xl border-2 border-amber-500/30 bg-white/95 dark:bg-white/5 backdrop-blur-2xl">
+              {/* Header */}
+              <div className="mb-8">
+                <h1 className="text-3xl font-bold text-stone-900 dark:text-white mb-2">
+                  Comece agora
+                </h1>
+                <p className="text-stone-600 dark:text-stone-400">
+                  Preencha seus dados para ativar sua plataforma
+                </p>
+              </div>
 
-            {/* Owner Name */}
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
-                <FiUser className="text-amber-500" />
-                Nome do Proprietário *
-              </label>
-              <input
-                type="text"
-                value={formData.ownerName}
-                onChange={(e) => updateField('ownerName', e.target.value)}
-                placeholder="Seu nome completo"
-                className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
-              />
-              {errors.ownerName && <p className="text-red-500 text-xs mt-1">{errors.ownerName}</p>}
-            </div>
+              {errors.general && (
+                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 rounded-xl text-red-700 dark:text-red-400 text-sm flex items-start gap-3">
+                  <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <span>{errors.general}</span>
+                </div>
+              )}
 
-            {/* Phone */}
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
-                <FiPhone className="text-amber-500" />
-                Telefone *
-              </label>
-              <input
-                type="tel"
-                value={formData.restaurantPhone}
-                onChange={(e) => updateField('restaurantPhone', e.target.value)}
-                placeholder="(00) 00000-0000"
-                className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
-              />
-              {errors.restaurantPhone && <p className="text-red-500 text-xs mt-1">{errors.restaurantPhone}</p>}
-            </div>
+              {/* Form Fields */}
+              <div className="space-y-6">
+                {/* Section 1: Restaurante */}
+                <div className="space-y-4 pb-6 border-b border-stone-200 dark:border-white/10">
+                  <h3 className="text-sm font-semibold text-stone-700 dark:text-stone-300 uppercase tracking-wide">Informações do Restaurante</h3>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
+                      Nome do Restaurante *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.restaurantName}
+                      onChange={(e) => updateField('restaurantName', e.target.value)}
+                      placeholder="Ex: Restaurante do João"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-stone-200 dark:border-white/10 bg-white dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                    />
+                    {errors.restaurantName && <p className="text-red-500 text-xs mt-2 flex items-center gap-1"><span>⚠</span> {errors.restaurantName}</p>}
+                  </div>
 
-            {/* CPF/CNPJ */}
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
-                <FiFileText className="text-amber-500" />
-                Documento *
-              </label>
-              <div className="flex gap-2">
-                {/* Document Type Select */}
-                <select
-                  value={documentType}
-                  onChange={(e) => handleDocumentTypeChange(e.target.value as 'cpf' | 'cnpj')}
-                  className="px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white focus:outline-none focus:border-amber-500 transition-colors"
-                  title="Tipo de documento"
-                >
-                  <option value="cpf">CPF</option>
-                  <option value="cnpj">CNPJ</option>
-                </select>
+                  <div>
+                    <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
+                      Telefone *
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.restaurantPhone}
+                      onChange={(e) => updateField('restaurantPhone', e.target.value)}
+                      placeholder="(00) 00000-0000"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-stone-200 dark:border-white/10 bg-white dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                    />
+                    {errors.restaurantPhone && <p className="text-red-500 text-xs mt-2 flex items-center gap-1"><span>⚠</span> {errors.restaurantPhone}</p>}
+                  </div>
+                </div>
+
+                {/* Section 2: Proprietário */}
+                <div className="space-y-4 pb-6 border-b border-stone-200 dark:border-white/10">
+                  <h3 className="text-sm font-semibold text-stone-700 dark:text-stone-300 uppercase tracking-wide">Dados do Proprietário</h3>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
+                      Nome Completo *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.ownerName}
+                      onChange={(e) => updateField('ownerName', e.target.value)}
+                      placeholder="Seu nome completo"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-stone-200 dark:border-white/10 bg-white dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                    />
+                    {errors.ownerName && <p className="text-red-500 text-xs mt-2 flex items-center gap-1"><span>⚠</span> {errors.ownerName}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
+                      Documento *
+                    </label>
+                    <div className="flex gap-2">
+                      <select
+                        value={documentType}
+                        onChange={(e) => handleDocumentTypeChange(e.target.value as 'cpf' | 'cnpj')}
+                        className="px-4 py-3 rounded-xl border-2 border-stone-200 dark:border-white/10 bg-white dark:bg-white/5 text-stone-900 dark:text-white focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all font-medium"
+                      >
+                        <option value="cpf">CPF</option>
+                        <option value="cnpj">CNPJ</option>
+                      </select>
+                      
+                      <input
+                        type="text"
+                        value={formData.cpfCnpj}
+                        onChange={(e) => handleCpfCnpjChange(e.target.value)}
+                        placeholder={documentType === 'cpf' ? '000.000.000-00' : '00.000.000/0000-00'}
+                        maxLength={documentType === 'cpf' ? 14 : 18}
+                        className="flex-1 px-4 py-3 rounded-xl border-2 border-stone-200 dark:border-white/10 bg-white dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                      />
+                    </div>
+                    {errors.cpfCnpj && <p className="text-red-500 text-xs mt-2 flex items-center gap-1"><span>⚠</span> {errors.cpfCnpj}</p>}
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                onClick={handleSubmit}
+                disabled={isLoading}
+                className="w-full mt-8 relative group px-6 py-4 rounded-xl font-semibold text-lg text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 overflow-hidden"
+              >
+                {/* Gradient background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 opacity-100 group-hover:opacity-95 transition-opacity" />
                 
-                {/* Document Number Input */}
-                <input
-                  type="text"
-                  value={formData.cpfCnpj}
-                  onChange={(e) => handleCpfCnpjChange(e.target.value)}
-                  placeholder={documentType === 'cpf' ? '000.000.000-00' : '00.000.000/0000-00'}
-                  maxLength={documentType === 'cpf' ? 14 : 18}
-                  className="flex-1 px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
-                />
-              </div>
-              {errors.cpfCnpj && <p className="text-red-500 text-xs mt-1">{errors.cpfCnpj}</p>}
-            </div>
-          </div>
+                {/* Shine effect */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity" style={{
+                  backgroundImage: 'linear-gradient(90deg, transparent, white, transparent)',
+                  backgroundSize: '200% 100%',
+                  animation: 'shimmer 2s infinite',
+                }} />
+                
+                {/* Content */}
+                <div className="relative flex items-center justify-center gap-2">
+                  {isLoading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Processando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FiCheck size={20} className="stroke-current" />
+                      <span>Finalizar Cadastro</span>
+                    </>
+                  )}
+                </div>
+              </button>
 
-          {/* Submit Button */}
-          <div className="mt-8 flex justify-center">
-            <button
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className="group relative w-full md:w-auto px-12 py-4 rounded-2xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 overflow-hidden"
-            >
-              {/* Animated gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 opacity-90 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 opacity-40 blur-xl group-hover:blur-2xl transition-all duration-300" />
-              
-              {/* Shimmer effect */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-30 animate-pulse" style={{
-                backgroundImage: 'linear-gradient(90deg, transparent, white, transparent)',
-                backgroundSize: '200% 100%',
-              }} />
-              
-              {/* Button content */}
-              <div className="relative flex items-center justify-center gap-3 text-white">
-                {isLoading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Salvando...</span>
-                  </>
-                ) : (
-                  <>
-                    <FiCheck size={20} />
-                    <span>Finalizar Cadastro</span>
-                  </>
-                )}
-              </div>
-            </button>
+              {/* Footer text */}
+              <p className="text-center text-xs text-stone-500 dark:text-stone-400 mt-6">
+                Seus dados são protegidos e criptografados
+              </p>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* CSS for animations */}
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          25% { transform: translateY(-20px) translateX(10px); }
+          50% { transform: translateY(-40px) translateX(0px); }
+          75% { transform: translateY(-20px) translateX(-10px); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: calc(200% + 200px) 0; }
+        }
+      `}</style>
     </div>
   )
 }
