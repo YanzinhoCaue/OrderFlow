@@ -6,7 +6,7 @@ import { completeOnboarding, completeCustomerOnboarding } from '@/app/actions/on
 import { validateCPF, formatCPF } from '@/lib/validations/cpf'
 import { validateCNPJ, formatCNPJ } from '@/lib/validations/cnpj'
 import ThemeSwitcher from '@/components/shared/ThemeSwitcher'
-import { FiUser, FiPhone, FiFileText, FiCheck, FiShoppingBag, FiSettings } from 'react-icons/fi'
+import { FiUser, FiPhone, FiFileText, FiCheck, FiSettings } from 'react-icons/fi'
 
 interface FormData {
   userType: 'customer' | 'owner'
@@ -211,212 +211,106 @@ export default function OnboardingWizard() {
             <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-3">
               Você é: *
             </label>
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                onClick={() => updateField('userType', 'owner')}
-                className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                  formData.userType === 'owner'
-                    ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-500/10'
-                    : 'border-amber-300/50 dark:border-white/10 bg-white/50 dark:bg-white/5 hover:border-amber-400'
-                }`}
-              >
-                <div className="flex flex-col items-center gap-3">
-                  <div className={`p-4 rounded-full ${
-                    formData.userType === 'owner'
-                      ? 'bg-amber-500 text-white'
-                      : 'bg-amber-100 dark:bg-white/10 text-amber-600 dark:text-amber-400'
-                  }`}>
-                    <FiSettings size={22} />
-                  </div>
-                  <div className="text-center">
-                    <h3 className="font-bold text-stone-800 dark:text-stone-100">Proprietário</h3>
-                    <p className="text-xs text-stone-600 dark:text-stone-400 mt-1">Gerenciar restaurante</p>
-                  </div>
-                  {formData.userType === 'owner' && (
-                    <FiCheck className="text-amber-500" size={20} strokeWidth={3} />
-                  )}
+            <button
+              type="button"
+              onClick={() => updateField('userType', 'owner')}
+              disabled
+              className={`w-full p-4 rounded-xl border-2 transition-all duration-300 border-amber-500 bg-amber-50/50 dark:bg-amber-500/10`}
+            >
+              <div className="flex flex-col items-center gap-3">
+                <div className={`p-4 rounded-full bg-amber-500 text-white`}>
+                  <FiSettings size={22} />
                 </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { updateField('userType', 'customer'); setDocumentType('cpf') }}
-                className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                  formData.userType === 'customer'
-                    ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-500/10'
-                    : 'border-amber-300/50 dark:border-white/10 bg-white/50 dark:bg-white/5 hover:border-amber-400'
-                }`}
-              >
-                <div className="flex flex-col items-center gap-3">
-                  <div className={`p-4 rounded-full ${
-                    formData.userType === 'customer'
-                      ? 'bg-amber-500 text-white'
-                      : 'bg-amber-100 dark:bg-white/10 text-amber-600 dark:text-amber-400'
-                  }`}>
-                    <FiShoppingBag size={22} />
-                  </div>
-                  <div className="text-center">
-                    <h3 className="font-bold text-stone-800 dark:text-stone-100">Cliente</h3>
-                    <p className="text-xs text-stone-600 dark:text-stone-400 mt-1">Fazer pedidos</p>
-                  </div>
-                  {formData.userType === 'customer' && (
-                    <FiCheck className="text-amber-500" size={20} strokeWidth={3} />
-                  )}
+                <div className="text-center">
+                  <h3 className="font-bold text-stone-800 dark:text-stone-100">Proprietário</h3>
+                  <p className="text-xs text-stone-600 dark:text-stone-400 mt-1">Gerenciar restaurante</p>
                 </div>
-              </button>
-            </div>
+                <FiCheck className="text-amber-500" size={20} strokeWidth={3} />
+              </div>
+            </button>
           </div>
 
           {/* Dynamic Form */}
-          {formData.userType === 'owner' ? (
-            <div className="space-y-4">
-              {/* Restaurant Name */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
-                  <FiFileText className="text-amber-500" />
-                  Nome do Restaurante *
-                </label>
-                <input
-                  type="text"
-                  value={formData.restaurantName}
-                  onChange={(e) => updateField('restaurantName', e.target.value)}
-                  placeholder="Ex: Restaurante do João"
-                  className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
-                />
-                {errors.restaurantName && <p className="text-red-500 text-xs mt-1">{errors.restaurantName}</p>}
-              </div>
-
-              {/* Owner Name */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
-                  <FiUser className="text-amber-500" />
-                  Nome do Proprietário *
-                </label>
-                <input
-                  type="text"
-                  value={formData.ownerName}
-                  onChange={(e) => updateField('ownerName', e.target.value)}
-                  placeholder="Seu nome completo"
-                  className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
-                />
-                {errors.ownerName && <p className="text-red-500 text-xs mt-1">{errors.ownerName}</p>}
-              </div>
-
-              {/* Phone */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
-                  <FiPhone className="text-amber-500" />
-                  Telefone *
-                </label>
-                <input
-                  type="tel"
-                  value={formData.restaurantPhone}
-                  onChange={(e) => updateField('restaurantPhone', e.target.value)}
-                  placeholder="(00) 00000-0000"
-                  className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
-                />
-                {errors.restaurantPhone && <p className="text-red-500 text-xs mt-1">{errors.restaurantPhone}</p>}
-              </div>
-
-              {/* CPF/CNPJ */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
-                  <FiFileText className="text-amber-500" />
-                  Documento *
-                </label>
-                <div className="flex gap-2">
-                  {/* Document Type Select */}
-                  <select
-                    value={documentType}
-                    onChange={(e) => handleDocumentTypeChange(e.target.value as 'cpf' | 'cnpj')}
-                    className="px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white focus:outline-none focus:border-amber-500 transition-colors"
-                    title="Tipo de documento"
-                  >
-                    <option value="cpf">CPF</option>
-                    <option value="cnpj">CNPJ</option>
-                  </select>
-                  
-                  {/* Document Number Input */}
-                  <input
-                    type="text"
-                    value={formData.cpfCnpj}
-                    onChange={(e) => handleCpfCnpjChange(e.target.value)}
-                    placeholder={documentType === 'cpf' ? '000.000.000-00' : '00.000.000/0000-00'}
-                    maxLength={documentType === 'cpf' ? 14 : 18}
-                    className="flex-1 px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
-                  />
-                </div>
-                {errors.cpfCnpj && <p className="text-red-500 text-xs mt-1">{errors.cpfCnpj}</p>}
-              </div>
+          <div className="space-y-4">
+            {/* Restaurant Name */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
+                <FiFileText className="text-amber-500" />
+                Nome do Restaurante *
+              </label>
+              <input
+                type="text"
+                value={formData.restaurantName}
+                onChange={(e) => updateField('restaurantName', e.target.value)}
+                placeholder="Ex: Restaurante do João"
+                className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
+              />
+              {errors.restaurantName && <p className="text-red-500 text-xs mt-1">{errors.restaurantName}</p>}
             </div>
-          ) : (
-            <div className="space-y-4">
-              {/* Full Name */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
-                  <FiUser className="text-amber-500" />
-                  Nome Completo *
-                </label>
-                <input
-                  type="text"
-                  value={formData.fullName}
-                  onChange={(e) => updateField('fullName', e.target.value)}
-                  placeholder="Seu nome completo"
-                  className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
-                />
-                {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
-              </div>
 
-              {/* Phone */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
-                  <FiPhone className="text-amber-500" />
-                  Telefone *
-                </label>
-                <input
-                  type="tel"
-                  value={formData.restaurantPhone}
-                  onChange={(e) => updateField('restaurantPhone', e.target.value)}
-                  placeholder="(00) 00000-0000"
-                  className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
-                />
-                {errors.restaurantPhone && <p className="text-red-500 text-xs mt-1">{errors.restaurantPhone}</p>}
-              </div>
+            {/* Owner Name */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
+                <FiUser className="text-amber-500" />
+                Nome do Proprietário *
+              </label>
+              <input
+                type="text"
+                value={formData.ownerName}
+                onChange={(e) => updateField('ownerName', e.target.value)}
+                placeholder="Seu nome completo"
+                className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
+              />
+              {errors.ownerName && <p className="text-red-500 text-xs mt-1">{errors.ownerName}</p>}
+            </div>
 
-              {/* CPF */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
-                  <FiFileText className="text-amber-500" />
-                  CPF *
-                </label>
+            {/* Phone */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
+                <FiPhone className="text-amber-500" />
+                Telefone *
+              </label>
+              <input
+                type="tel"
+                value={formData.restaurantPhone}
+                onChange={(e) => updateField('restaurantPhone', e.target.value)}
+                placeholder="(00) 00000-0000"
+                className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
+              />
+              {errors.restaurantPhone && <p className="text-red-500 text-xs mt-1">{errors.restaurantPhone}</p>}
+            </div>
+
+            {/* CPF/CNPJ */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
+                <FiFileText className="text-amber-500" />
+                Documento *
+              </label>
+              <div className="flex gap-2">
+                {/* Document Type Select */}
+                <select
+                  value={documentType}
+                  onChange={(e) => handleDocumentTypeChange(e.target.value as 'cpf' | 'cnpj')}
+                  className="px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white focus:outline-none focus:border-amber-500 transition-colors"
+                  title="Tipo de documento"
+                >
+                  <option value="cpf">CPF</option>
+                  <option value="cnpj">CNPJ</option>
+                </select>
+                
+                {/* Document Number Input */}
                 <input
                   type="text"
                   value={formData.cpfCnpj}
                   onChange={(e) => handleCpfCnpjChange(e.target.value)}
-                  placeholder={'000.000.000-00'}
-                  maxLength={14}
-                  className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
-                />
-                {errors.cpfCnpj && <p className="text-red-500 text-xs mt-1">{errors.cpfCnpj}</p>}
-              </div>
-
-              {/* Address */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
-                  <FiFileText className="text-amber-500" />
-                  Endereço
-                </label>
-                <input
-                  type="text"
-                  value={formData.address}
-                  onChange={(e) => updateField('address', e.target.value)}
-                  placeholder="Rua, número, bairro, cidade"
-                  className="w-full px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
+                  placeholder={documentType === 'cpf' ? '000.000.000-00' : '00.000.000/0000-00'}
+                  maxLength={documentType === 'cpf' ? 14 : 18}
+                  className="flex-1 px-4 py-2.5 rounded-xl border-2 border-amber-300/50 dark:border-white/10 bg-white/80 dark:bg-white/5 text-stone-900 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 transition-colors"
                 />
               </div>
+              {errors.cpfCnpj && <p className="text-red-500 text-xs mt-1">{errors.cpfCnpj}</p>}
             </div>
-          )}
+          </div>
 
           {/* Submit Button */}
           <div className="mt-8 flex justify-center">
