@@ -62,15 +62,9 @@ export async function updateSession(request: NextRequest) {
 
     // If trying to access protected route without auth, redirect to login
     if (isProtectedPath && !user) {
+      console.log('[MIDDLEWARE] Redirecting to login - no user')
       const url = request.nextUrl.clone()
       url.pathname = '/login'
-      return NextResponse.redirect(url)
-    }
-
-    // If user is logged in and trying to access login page, redirect to dashboard
-    if (user && isPublicPath && request.nextUrl.pathname === '/login') {
-      const url = request.nextUrl.clone()
-      url.pathname = '/dashboard'
       return NextResponse.redirect(url)
     }
 

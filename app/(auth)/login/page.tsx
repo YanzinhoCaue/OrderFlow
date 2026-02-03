@@ -23,13 +23,44 @@ export default async function LoginPage({ searchParams }: Props) {
     const supabase = await createClient()
     const { data: { user: authUser } } = await supabase.auth.getUser()
     user = authUser
+    
+    if (user) {
+      console.log('[LOGIN] User authenticated, checking profile/restaurant...')
+      
+      // Check if user has a profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+      
+      console.log('[LOGIN] Profile:', profile)
+      
+      if (!profile) {
+        console.log('[LOGIN] No profile, redirecting to onboarding')
+        redirect('/onboarding')
+      }
+      
+      // Check if user has a restaurant
+      const { data: restaurant } = await supabase
+        .from('restaurants')
+        .select('*')
+        .eq('owner_id', user.id)
+        .single()
+      
+      console.log('[LOGIN] Restaurant:', restaurant)
+      
+      if (!restaurant) {
+        console.log('[LOGIN] No restaurant, redirecting to onboarding')
+        redirect('/onboarding')
+      }
+      
+      console.log('[LOGIN] Has profile and restaurant, redirecting to dashboard')
+      redirect(redirectUrl || '/dashboard')
+    }
   } catch (error) {
-    console.error('Error getting user from Supabase:', error)
+    console.error('[LOGIN] Error getting user from Supabase:', error)
     // Continue rendering login page if auth check fails
-  }
-
-  if (user) {
-    redirect(redirectUrl || '/dashboard')
   }
 
   return (
